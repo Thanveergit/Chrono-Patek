@@ -1,0 +1,177 @@
+<%-include("../layout/commonHeader")%>
+<!-- css -->
+<link rel="stylesheet" href="/assets/css/editAddress.css">
+
+<!-- breadcrumb -->
+<div class="container ">
+    <div class="bread-crumb flex-w p-l-25 p-r-15 p-t-30 p-lr-0-lg">
+        <a href="/" class="stext-109 cl8 hov-cl1 trans-04">
+            Home
+            <i class="fa fa-angle-right m-l-9 m-r-10" aria-hidden="true"></i>
+        </a>
+        <a href="/profile" class="stext-109 cl8 hov-cl1 trans-04">
+            Profile
+            <i class="fa fa-angle-right m-l-9 m-r-10" aria-hidden="true"></i>
+        </a>
+        <a href="/address" class="stext-109 cl8 hov-cl1 trans-04">
+            Address
+            <i class="fa fa-angle-right m-l-9 m-r-10" aria-hidden="true"></i>
+        </a>
+        <span class="stext-109 cl4">
+            Edit Address
+        </span>
+    </div>
+</div>
+
+<!-- Edit Address Form -->
+<div class="container mt-lg-4">
+    <div id="editAddressForm">
+        <form id="actualEditAddressForm">
+            <input type="hidden" name="addressId" value="<%= address._id %>">
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" class="form-control" id="name" name="name" value="<%= address.name %>" required>
+                <small id="nameError" class="text-danger"></small>
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone</label>
+                <input type="text" class="form-control" id="phone" name="phone" value="<%= address.phone %>" required>
+                <small id="phoneError" class="text-danger"></small>
+            </div>
+            <div class="form-group">
+                <label for="district">District</label>
+                <input type="text" class="form-control" id="district" name="district" value="<%= address.district %>" required>
+                <small id="districtError" class="text-danger"></small>
+            </div>
+            <div class="form-group">
+                <label for="city">City</label>
+                <input type="text" class="form-control" id="city" name="city" value="<%= address.city %>" required>
+                <small id="cityError" class="text-danger"></small>
+            </div>
+            <div class="form-group">
+                <label for="house">House</label>
+                <input type="text" class="form-control" id="house" name="house" value="<%= address.house %>" required>
+                <small id="houseError" class="text-danger"></small>
+            </div>
+            <div class="form-group">
+                <label for="state">State</label>
+                <input type="text" class="form-control" id="state" name="state" value="<%= address.state %>" required>
+                <small id="stateError" class="text-danger"></small>
+            </div>
+            <div class="form-group">
+                <label for="pincode">Pincode</label>
+                <input type="text" class="form-control" id="pincode" name="pincode" value="<%= address.pincode %>" required>
+                <small id="pincodeError" class="text-danger"></small>
+            </div>
+            <button type="submit" class="btn btn-primary">Update Address</button>
+            <button type="button" class="btn btn-secondary ml-2" onclick="cancelEdit()">Cancel</button>
+        </form>
+    </div>
+</div>
+
+<%- include("../layout/commonFooter.ejs") %>
+
+<!-- Include Axios and SweetAlert libraries -->
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const validationPatterns = {
+            name: /^[A-Za-z]+(?: [A-Za-z]+)*$/,
+            phone: /^[1-9]\d{9}$/,
+            district: /^[A-Za-z]{3,}$/,
+            city: /^[A-Za-z]+(?: [A-Za-z]+)*$/,
+            house: /^[A-Za-z]{3,}$/,
+            state: /^[A-Za-z]{3,}$/,
+            pincode: /^\d{6}$/
+        };
+
+        const errorMessages = {
+            name: 'Name should start with a letter and contain only letters and spaces.',
+            phone: 'Please provide a valid 10 digit mobile number.',
+            district: 'Please provide a valid district name.',
+            city: 'Please provide a valid city name.',
+            house: 'Please provide a valid house name or number.',
+            state: 'Please provide a valid state name.',
+            pincode: 'Please provide a valid 6 digit pincode.'
+        };
+
+        const fields = Object.keys(validationPatterns);
+
+        fields.forEach(field => {
+            const input = document.getElementById(field);
+            input.addEventListener('input', function () {
+                const errorElement = document.getElementById(`${field}Error`);
+                if (!validationPatterns[field].test(this.value)) {
+                    errorElement.innerText = errorMessages[field];
+                } else {
+                    errorElement.innerText = '';
+                }
+            });
+        });
+
+        document.getElementById('actualEditAddressForm').addEventListener('submit', async function (event) {
+            event.preventDefault();
+            let isValid = true;
+
+            fields.forEach(field => {
+                const input = document.getElementById(field);
+                const errorElement = document.getElementById(`${field}Error`);
+                if (!validationPatterns[field].test(input.value.trim())) {
+                    errorElement.innerText = errorMessages[field];
+                    isValid = false;
+                } else {
+                    errorElement.innerText = '';
+                }
+            });
+
+            if (!isValid) return;
+
+            const formData = new FormData(this);
+            const formEntries = Object.fromEntries(formData.entries());
+
+            try {
+                const response = await axios.post('/editAddress', formEntries);
+
+                if (response.status === 200) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: 'Address updated successfully',
+                        width: '300px',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+
+                    setTimeout(() => {
+                        window.location.href = '/address';
+                    }, 1500);
+
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: 'There was an error updating the address',
+                        width: '300px',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                }
+            } catch (error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'Something went wrong',
+                    width: '300px',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+            }
+        });
+    });
+
+    function cancelEdit() {
+        window.location.href = '/address';
+    }
+</script>

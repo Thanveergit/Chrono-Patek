@@ -1,0 +1,262 @@
+<%- include("../layout/adminHeader") %>
+<%- include("../layout/adminSidebarHead") %>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <link rel="stylesheet" href="/css/adminOrderDetails.css">
+  <style>
+     .status-delivered {
+    color: green;
+}
+.status-ordered {
+    color: orange;
+}
+.status-shipped {
+    color: blue;
+}
+.status-cancelled {
+    color: red;
+}
+.status-return-pending{
+    color: chocolate;
+}
+.status-returned {
+    color: salmon;
+}
+
+.small-title {
+    font-size: 12px;
+}
+.small-text {
+    font-size: 8px;
+}
+
+.small-button {
+    font-size: 8px;
+    padding: 5px 10px;
+}
+
+
+  </style>
+  <div class="main-panel">
+     <div class="content-wrapper col-lg-12">
+         <div class="page-header pt-5">
+             <h3 class="page-title d-flex align-items-center">
+                 <span class="page-title-icon btn-gradient-primary text-white mr-2">
+                     <i class="mdi mdi-receipt menu-icon"></i>
+                 </span>
+                 Order Details
+             </h3>
+             <nav aria-label="breadcrumb">
+                 <ul class="breadcrumb">
+                     <li class="breadcrumb-item active" aria-current="page">
+                         <span></span>
+                         <button class="btn btn-outline-github" onclick="location.href='/admin/orders'">Back to orders</button>
+                     </li>
+                 </ul>
+             </nav>
+         </div>
+
+         <section class="order-detail spad">
+             <div class="container">
+                 <div class="row">
+                     <div class="col-lg-12 col-md-12">
+                         <%if(order){%>
+
+                         
+                         <!-- Order Details -->
+                         <div class="order-summary">
+                             <div class="card mb-4 ms-3">
+                                 <div class="card-body">
+                                     <h2 class="card-title">Order Details</h2>
+                                     <p class="card-text">
+                                         <span class="fw-bold">Order ID : </span><span id="orderID"><%=order.orderId%></span><br>
+                                         <span class="fw-bold mt-2">Order Date : </span><span id="orderDate"><%=order.date.toLocaleDateString()%></span><br>
+                                         <span class="fw-bold mt-2">Total Amount : </span><span id="orderDate"> ₹ <%=order.totalPrice%></span><br>
+                                         <span class="fw-bold mt-2">Payment Method : </span><span id="paymentMethod"><%=order.paymentMethod%></span><br>
+                                         <span class="fw-bold mt-2">Customer Name : </span><span id="customerName"><%=order.userId.name%></span>
+                                     </p>
+                                 </div>
+                             </div>
+                             <div class="card mb-3 ms-3">
+                                 <div class="card-body">
+                                     <h5 class="card-title">Delivery Address</h5>
+                                     <p class="card-text">
+                                         <span class="fw-bold">Name: </span><span id="addressName"><%=order.address.name%></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                         <span class="fw-bold">Email: </span><span id="addressEmail"><%=order.userId.email%></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                         <span class="fw-bold">Mobile: </span><span id="addressMobile"><%=order.userId.phone%></span><br>
+                                     </p>
+                                     <p class="card-text">
+                                         <span class="fw-bold">Address Details: </span><br>
+                                         <span id="addressDetails"><%=order.address.house%>, <%=order.address.district%> District, <%=order.address.state%>, <%=order.address.pincode%></span>
+                                     </p>
+                                 </div>
+                             </div>
+                             <div class="container">
+                                 <h5 class="mt-3">Items : </h5>
+                                 <div class="row" id="orderItems">
+                                   <%order.items.forEach(item=>{%>
+                                     <div class="col-md-6 mb-4">
+                                         <div class="card">
+                                             <div class="card-body">
+                                                 <div class="row">
+                                                     <div class="col-md-6">
+                                                         <a href="#">
+                                                             <img src="/uploads/product-images/<%=item.image%>" alt="<%=item.productName%>" class="img-fluid">
+                                                         </a>
+                                                         <h5 class="mt-2"><%=item.productName%></h5>
+                                                         <p>Category: <span style="color: teal;"><%=item.categoryName%></span></p>
+                                                     </div>
+                                                     <div class="col-md-6">
+                                                         <p>Quantity : <%=item.quantity%></p>  
+                                                         <p>Price : &#8377;<%=(item.price * item.quantity).toFixed(2) %></p>
+                                                         <!-- <p>Final Price : &#8377;1000.00</p> -->
+                                                         <p id="status-item-1">
+                                                             <span>Status : </span><span class="status-<%=item.itemStatus.toLowerCase()%>"><%=item.itemStatus%></span>
+                                                         </p>
+                                                         <p>Change Status :
+                                                            <select class="form-control mb-3"
+                                                                onchange="handleStatusChange('<%=order._id%>', '<%=item._id%>', this.value, '<%=item.itemStatus%>')"
+                                                            >
+                                                                <% if (item.itemStatus === 'Returned' || item.itemStatus === 'Approve') { %>
+                                                                    <option value="" disabled selected>This item is approved and cannot be changed</option>
+                                                                <% } else if (item.itemStatus === "Return Pending") { %>
+                                                                    <option value="" disabled selected>Select Action</option>
+                                                                    <option value="Approve" <%= item.itemStatus === 'Returned' ? 'disabled' : '' %>>Approve</option>
+                                                                <% } else { %>
+                                                                    <option value="Ordered" disabled <%= item.itemStatus === 'Ordered' ? 'selected' : '' %> <%= item.itemStatus === 'Delivered' ? 'disabled' : '' %>>Ordered</option>
+                                                                    <option value="Shipped" <%= item.itemStatus === 'Shipped' ? 'selected' : '' %> <%= item.itemStatus === 'Delivered' ? 'disabled' : '' %>>Shipped</option>
+                                                                    <option value="Delivered" <%= item.itemStatus === 'Delivered' ? 'selected' : '' %> <%= item.itemStatus === 'Delivered' ? 'disabled' : '' %>>Delivered</option>
+                                                                    <option value="Canceled" disabled <%= item.itemStatus === 'Cancelled' ? 'selected' : '' %> <%= item.itemStatus === 'Delivered' ? 'disabled' : '' %>>Canceled</option>
+                                                                    <option value="Returned" disabled <%= item.itemStatus === 'Returned' ? 'selected' : '' %> <%= item.itemStatus === 'Delivered' ? 'disabled' : '' %>>Returned</option>
+                                                                <% } %>
+                                                            </select>
+
+                                                         </p>
+                                                     </div>                                                            
+                                                 </div>
+                                             </div> 
+                                         </div>
+                                     </div>
+                                     <%})%>
+                                     
+                                 </div>
+                             </div>
+                         </div>
+                         <%}%>
+                     </div>
+                 </div>
+             </div>
+         </section>
+         
+     </div>
+ </div>
+
+ <%- include("../layout/adminSidebarFooter") %>
+  <%- include("../layout/adminFooter") %>
+ <script>
+    function handleStatusChange(orderId, itemId, status, itemStatus) {
+    if (itemStatus === 'Return Pending') {
+        confirmUpdateReturnStatus(orderId, itemId, status);
+    } else {
+        confirmUpdateOrderStatus(orderId, itemId, status);
+    }
+}
+
+function confirmUpdateOrderStatus(orderId, itemId, status) {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: `Do you want to change the status to ${status}?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, change it!',
+        cancelButtonText: 'No, cancel!',
+    }).then((result) => {
+        if (result.isConfirmed) {
+            updateOrderStatus(orderId, itemId, status);
+        }
+    });
+}
+
+function updateOrderStatus(orderId, itemId, status) {
+    axios.post('/admin/updateOrderStatus', { orderId, itemId, currentStatus: status })
+        .then(response => {
+            const { status } = response.data;
+            const statusElement = document.getElementById(`status-item-${itemId}`);
+            if (statusElement) {
+                const statusText = status ? status.toLowerCase() : '';
+                statusElement.innerHTML = `<span>Status : </span><span class="status-${statusText}">${statusText}</span>`;
+            }
+            Swal.fire({
+                icon: 'success',
+                title: 'Status Updated',
+                text: `The status has been updated successfully.`,
+                timer: 1500,
+                showConfirmButton: false,
+            }).then(() => {
+                window.location.reload();
+            });
+        })
+        .catch(error => {
+            console.error('Error updating order status:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'There was an error updating the status.',
+                timer: 1500,
+                showConfirmButton: false,
+            });
+        });
+}
+
+function confirmUpdateReturnStatus(orderId, itemId, status) {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: `Do you want to change the return status to ${status}?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, change it!',
+        cancelButtonText: 'No, cancel!',
+    }).then((result) => {
+        if (result.isConfirmed) {
+            updateReturnStatus(orderId, itemId, status);
+        }
+    });
+}
+
+function updateReturnStatus(orderId, itemId, status) {
+    axios.post('/admin/returnApproval', { orderId, itemId, status })
+        .then(response => {
+            const { status } = response.data;
+            const statusElement = document.getElementById(`status-item-${itemId}`);
+            if (statusElement) {
+                const statusText = status ? status.toLowerCase() : '';
+                statusElement.innerHTML = `<span>Status : </span><span class="status-${statusText}">${statusText}</span>`;
+            }
+            Swal.fire({
+                icon: 'success',
+                title: 'Return Status Updated',
+                text: `The return status has been updated successfully.`,
+                timer: 1500,
+                showConfirmButton: false,
+            }).then(() => {
+                window.location.reload();
+            });
+        })
+        .catch(error => {
+            console.error('Error updating return status:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'There was an error updating the return status.',
+                timer: 1500,
+                showConfirmButton: false,
+            });
+        });
+}
+
+ </script>

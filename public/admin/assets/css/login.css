@@ -1,0 +1,105 @@
+
+.login-container {
+     background-color: rgba(255, 255, 255, 0.9);
+     border-radius: 10px;
+     padding: 30px;
+     box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+     width: 100%;
+     max-width: 400px;
+ }
+
+ .login-container h2 {
+     text-align: center;
+     margin-bottom: 20px;
+     font-weight: 700;
+     color: #333;
+ }
+
+ .login-container .form-group {
+     margin-bottom: 15px;
+ }
+
+ .login-container .form-control {
+     padding: 10px;
+     font-size: 1rem;
+ }
+
+ .login-container .error-message {
+     color: red;
+     font-size: 0.85rem;
+     margin-top: 5px;
+     display: none;
+ }
+
+ .login-container .btn {
+     width: 100%;
+     padding: 10px;
+     background-color: #000000;
+     color: white;
+     font-weight: 600;
+     cursor: pointer;
+ }
+
+ .login-container .btn:hover {
+     background-color: #717fe0;
+     
+ }
+
+ .login-container .google-btn {
+     width: 100%;
+     background-color: white;
+     color: #333;
+     border: 1px solid #ddd;
+     margin-top: 15px;
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     text-decoration: none;
+     padding: 10px;
+ }
+
+ .login-container .google-btn img {
+     margin-right: 10px;
+ }
+
+ .login-container p {
+     text-align: center;
+     margin-top: 20px;
+ }
+
+ .login-container p a {
+     color: #717fe0;
+ }
+
+ .login-container p a:hover {
+     text-decoration: underline;
+ }
+
+ .alert {
+     margin-bottom: 10px;
+     padding: 10px;
+     font-size: 0.9rem;
+ }
+
+ 
+ .login-container {
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    max-width: 400px;
+    width: 100%;
+}
+
+.logo img {
+    width: 120px;
+    margin-bottom: 20px;
+}
+
+.error-message {
+    color: red;
+    font-size: 0.75rem;
+    display: none;
+}
+

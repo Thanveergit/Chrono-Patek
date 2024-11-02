@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <link rel="stylesheet" href="/assets/css/login.css">
+     
+
+</head>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-image: url('/assets/images/pngtree-men-s-luxury-watch-black-banner-image_182858.jpg'); /* Background image for the entire screen */
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+    }
+    .error-message {
+        color: red;
+        font-size: 0.75rem;
+        display: none;
+    }
+</style>
+<body>
+    <div class="container">
+        <div class="image-section">
+            <img src="/assets/images/pat-taylor-12V36G17IbQ-unsplash.jpg" alt="Custom Image">
+        </div>
+        <div class="form-section">
+            <!-- Logo Part -->
+            <a href="/" class="logo">
+                <img src="/assets/images/icons/logo-01.png" alt="IMG-LOGO">
+            </a>
+
+            <h2>Login to your Account</h2>
+            <form action="/login" method="POST" id="login">
+                <input type="email" name="email" placeholder="Enter Email" id="email" value="thanveermohd95@gmail.com">
+                <div id="errorEmail" class="error-message"></div>
+                <input type="password" name="password" placeholder="Password" id="password" value="thanveer123">
+                <div id="errorPassword" class="error-message"></div>
+                <% if(locals.message && message.length>0){%>
+                    <div class="alert alert-danger text-center">
+                        <%=message%>
+                    </div>
+                <% } %>
+                <button type="submit">Login</button>
+                <a href="/auth/google" class="google-btn" id="registerBtn">
+                    <img src="https://img.icons8.com/color/16/000000/google-logo.png" alt="Google Logo">
+                    Continue with Google
+                </a>
+                <p>Don't have an account? <a href="/signup">Sign up</a></p>
+            </form>
+        </div>
+    </div>
+</body>
+
+<script>
+    // Corrected ID and constant name
+    const emailId = document.getElementById("email");
+    const passwordId = document.getElementById("password");
+    const errorEmail = document.getElementById("errorEmail");
+    const errorPassword = document.getElementById("errorPassword");
+    const login = document.getElementById("login");
+
+    function emailValidate(e) {
+        const emailVal = emailId.value.trim();
+        const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+
+        if (emailVal === "") {
+            errorEmail.style.display = "block";
+            errorEmail.innerHTML = "Email is required";
+        } else if (!emailPattern.test(emailVal)) {
+            errorEmail.style.display = 'block';
+            errorEmail.innerHTML = "Invalid email format";
+        } else {
+            errorEmail.style.display = "none";
+            errorEmail.innerHTML = "";
+        }
+    }
+
+    function passwordValidate(e) {
+        const passwordVal = passwordId.value.trim();
+        const alpha = /^[a-zA-Z]/;
+        const digit = /\d/;
+
+        if (passwordVal.length < 8) {
+            errorPassword.style.display = "block";
+            errorPassword.innerHTML = "Password should be at least 8 characters";
+        } else if (!alpha.test(passwordVal) || !digit.test(passwordVal)) {
+            errorPassword.style.display = 'block';
+            errorPassword.innerHTML = 'Password must contain both letters and digits';
+        } else {
+            errorPassword.style.display = "none";
+            errorPassword.innerHTML = "";
+        }
+    }
+
+    // Corrected event listeners
+    emailId.addEventListener("input", emailValidate);
+    passwordId.addEventListener("input", passwordValidate);
+
+    login.addEventListener("submit", function(e) {
+        emailValidate();
+        passwordValidate();
+
+        // Prevent form submission if there are errors
+        if (errorEmail.style.display === "block" || errorPassword.style.display === "block") {
+            e.preventDefault();
+        }
+    });
+</script>
+</html>

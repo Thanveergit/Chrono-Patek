@@ -1,0 +1,79 @@
+.card {
+     border: 1px solid #dee2e6;
+     border-radius: 0.25rem;
+     margin-bottom: 20px;
+ }
+ 
+ .card-header {
+     background-color: #f1f1f1;
+     padding: 0.75rem 1rem;
+ }
+ 
+ .card-header div {
+     text-align: center;
+ }
+ 
+ .card-body {
+     padding: 0.75rem 1rem;
+ }
+ 
+ .card-body img {
+     max-width: 100px;
+ }
+ 
+ .viewOrdersPdtName {
+     color: #1d1d1d;
+     font-weight: 500;
+     margin-bottom: 0.5rem;
+     font-size: 16px;
+ }
+ 
+ .btn-link {
+     color: #000000;
+     text-decoration: none;
+     padding: 0;
+ }
+ 
+ .btn-link:hover {
+     text-decoration: underline;
+ }
+ 
+ .card-footer {
+     padding: 0.75rem 1rem;
+ }
+ 
+ @media (max-width: 768px) {
+     .card-header .row > div {
+         text-align: left;
+         margin-bottom: 0.5rem;
+     }
+ 
+     .card-header .row > div:last-child {
+         margin-bottom: 0;
+     }
+ }
+ a {
+    color: black; /* Set text color to black */
+    text-decoration: none; /* Remove underline */
+}
+
+a:hover {
+    color: #717fe0; /* Change color on hover */
+}
+
+ 
+ .empty-cart-img {
+     max-width: 200px;
+ }
+ 
+ @media (max-width: 768px) {
+     .empty-cart-img {
+         max-width: 150px;
+     }
+ }
+ 
+ @media (max-width: 576px) {
+     .empty-cart-img {
+         max-width: 120px;
+     }
+ }

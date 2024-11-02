@@ -1,0 +1,390 @@
+<%- include("../layout/commonHeader") %>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+<style>
+    body {
+        font-family: 'Poppins-Medium';
+        
+    }
+    .wallet-container {
+        width: 80%; 
+        margin: 0 auto;
+        padding: 50px 0;
+    }
+    .wallet-balance {
+        font-size: 24px;
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    .add-funds-btn, .withdraw-btn {
+        background-color: #222;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        text-transform: uppercase;
+        margin: 10px;
+    }
+    .add-funds-btn:hover, .withdraw-btn:hover {
+        background-color: #717fe0;
+    }
+
+    .transaction-card {
+        background-color: #fff;
+        border: 1px solid #ddd;
+        padding: 20px;
+        margin-bottom: 20px;
+        border-radius: 5px;
+        box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    .transaction-details {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .transaction-id {
+        font-weight: bold;
+        color: #717fe0;
+    }
+    .transaction-date {
+        font-size: 14px;
+        color: #888;
+    }
+    .transaction-amount {
+        font-size: 18px;
+        color: #000;
+    }
+    .transaction-status {
+        font-size: 14px;
+        color: black;
+        font-weight: bold;
+    }
+    .transaction-status.failed {
+        color: red;
+    }
+    .continue-shopping {
+        margin-top: 25px;
+        display: flex;
+        justify-content: center;
+    }
+    .continue-shopping a {
+        color: #000;
+        font-size: 16px;
+        text-decoration: none;
+        display: inline-block;
+    }
+    .continue-shopping a:hover {
+        color: #717fe0;
+    }
+
+    .pagination-container {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.pagination {
+    display: flex;
+    align-items: center;
+    list-style: none;
+    padding: 0;
+}
+
+.pagination__link {
+    margin: 0 5px;
+    padding: 8px 12px;
+    border: 2px solid transparent;
+    border-radius: 4px;
+    text-decoration: none;
+    color: #222;
+    font-weight: bold;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+
+.pagination__link:hover {
+    background-color: #717fe0;
+    color: white;
+}
+
+.pagination__link.active {
+    background-color: #222;
+    color: white;
+    border-color: #222;
+}
+
+.pagination__link.disabled {
+    pointer-events: none;
+    color: #ccc;
+    border-color: #ccc;
+}
+
+
+.wallet-card {
+    background: linear-gradient(135deg, #000000, #003366, #0033cc); /* Black to darker blue gradient */
+        color: #fff; /* White text */
+        border-radius: 15px; /* Rounded corners */
+        padding: 20px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        width: 600px; /* Fixed width for card */
+        margin: 30px auto; /* Centered card */
+        position: relative;
+        text-align: center; /* Center text */
+    }
+    
+    .wallet-card-header {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        padding-bottom: 10px;
+        margin-bottom: 15px;
+    }
+
+    .wallet-balance {
+        font-size: 32px; /* Larger font for balance */
+        margin: 20px 0;
+    }
+
+    .wallet-actions {
+        display: flex;
+        justify-content: center; /* Center the button */
+    }
+</style>
+
+</head>
+<body>
+
+<!-- breadcrumb -->
+<div class="container p-t-75" id="breadcrumb-container">
+    <div class="bread-crumb flex-w p-l-25 p-r-15 p-t-30 p-lr-0-lg">
+        <a href="/" class="stext-109 cl8 hov-cl1 trans-04">
+            Home
+            <i class="fa fa-angle-right m-l-9 m-r-10" aria-hidden="true"></i>
+        </a>
+        <a href="/profile" class="stext-109 cl8 hov-cl1 trans-04">
+            Profile
+            <i class="fa fa-angle-right m-l-9 m-r-10" aria-hidden="true"></i>
+        </a>
+        <span class="stext-109 cl4">
+            Wallet
+        </span>
+    </div>
+</div>
+
+
+<div class="wallet-container">
+    <% if (wallet) { %>
+    <div class="wallet-card">
+        <div class="wallet-card-header">
+            <h2>Wallet Balance</h2>
+        </div>
+        <div class="wallet-balance">
+            <h3>₹<%= wallet.balance || 0 %></h3> <!-- Wallet balance with fallback to 0 -->
+        </div>
+        <div class="wallet-actions">
+            <button class="add-funds-btn" id="addFundsBtn">Add Funds</button>
+        </div>
+    </div>
+
+    <!-- Transaction history as cards -->
+    <% if (history.length > 0) { %>
+        <% history.forEach(history => { %>
+        <div class="transaction-card">
+            <div class="transaction-details">
+                <div>
+                    <div class="transaction-id">Transaction ID: <%= history._id %></div>
+                    <div class="transaction-date"><%= history.date.toLocaleDateString() %></div>
+                </div>
+                <div class="transaction-amount">₹<%= history.transactionAmount ? history.transactionAmount : history.amount %> </div>
+                <div class="transaction-status"><%=history.transactionType%></div>
+            </div>
+        </div>
+        <% }) %>
+    <% } else { %>
+        <!-- Show message if no transaction history exists -->
+        <div class="transaction-card">
+            <div class="transaction-details">
+                <div class="transaction-id">No transactions found</div>
+            </div>
+        </div>
+    <% } %>
+
+    <% } else { %>
+    <!-- Wallet is not defined, show balance as 0 and no transactions -->
+    <div class="wallet-card">
+        <div class="wallet-card-header">
+            <h2>Wallet Balance</h2>
+        </div>
+        <div class="wallet-balance">
+            <h3>₹0</h3> <!-- Display 0 when wallet is undefined -->
+        </div>
+        <div class="wallet-actions">
+            <button class="add-funds-btn" id="addFundsBtn">Add Funds</button>
+        </div>
+    </div>
+    <div class="transaction-card">
+        <div class="transaction-details">
+            <div class="transaction-id">No transactions found</div>
+        </div>
+    </div>
+    <% } %>
+
+    <!-- Pagination Controls -->
+    <% if (totalPages > 1) { %>
+    <div class="pagination-container">
+        <div class="pagination">
+            <a href="?page=<%= currentPage - 1 %>" class="pagination__link <%= currentPage === 1 ? 'disabled' : '' %>">« Previous</a>
+
+            <% for (let i = 1; i <= totalPages; i++) { %>
+                <a href="?page=<%= i %>" class="pagination__link <%= i === currentPage ? 'active' : '' %>"><%= i %></a>
+            <% } %>
+
+            <a href="?page=<%= currentPage + 1 %>" class="pagination__link <%= currentPage === totalPages ? 'disabled' : '' %>">Next »</a>
+        </div>
+    </div>
+    <% } %>
+</div>
+
+<!-- Continue Shopping Button -->
+<div class="continue-shopping">
+    <a href="/shop"><i class="fas fa-shopping-cart"></i> Continue Shopping</a>
+</div>
+
+
+<%- include("../layout/commonFooter") %>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+<script>
+    // Function to add funds to wallet
+    document.getElementById('addFundsBtn').addEventListener('click', function () {
+    Swal.fire({
+        title: 'Add Funds',
+        input: 'number',
+        inputLabel: 'Enter the amount to add',
+        inputPlaceholder: 'Amount',
+        showCancelButton: true,
+        confirmButtonText: 'Add',
+        preConfirm: (amount) => {
+            console.log(amount)
+            if (!amount || amount <= 0) {
+                Swal.showValidationMessage('Please enter a valid amount');
+            }
+            return amount;
+        }
+    }).then((result) => {
+        console.log(result)
+        if (result.isConfirmed) {
+            const amount = result.value;
+            console.log(amount)
+            
+            // Request to create Razorpay order
+            axios.post('wallet/addFunds', { amount: amount })
+            
+                .then(response => {
+                    console.log(response)
+                    const { razorpayOrderId, key, amount, name, email, phone } = response.data;
+                    console.log(razorpayOrderId)
+                    
+                    // Open Razorpay checkout
+                    const options = {
+                        key: key,
+                        amount: amount, // in paise
+                        currency: "INR",
+                        name: name,
+                        description: "Add Funds to Wallet",
+                        order_id: razorpayOrderId,
+                        handler: function (paymentResponse) {
+                            console.log(paymentResponse)
+                            // Verify payment on the server
+                            axios.post('wallet/verifyPayment', {
+                                razorpay_payment_id: paymentResponse.razorpay_payment_id,
+                                razorpay_order_id: paymentResponse.razorpay_order_id,
+                                razorpay_signature: paymentResponse.razorpay_signature,
+                                amount: amount // send in rupees
+                            })
+                            .then(verificationResponse => {
+                                if (verificationResponse.data.success) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Funds added successfully',
+                                        text: `₹${amount / 100} has been added to your wallet`,
+                                        timer: 2000,
+                                        showConfirmButton: false,
+                                        toast: true,
+                                        position: 'bottom'
+                                    });
+                                    setTimeout(() => window.location.reload(), 2000);
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error',
+                                        text: 'Payment verification failed. Please try again.',
+                                        timer: 3000,
+                                        showConfirmButton: false,
+                                        toast: true,
+                                        position: 'bottom'
+                                    });
+                                }
+                            })
+                            .catch(error => {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: 'Unable to verify payment. Please try again.',
+                                    timer: 3000,
+                                    showConfirmButton: false,
+                                    toast: true,
+                                    position: 'bottom'
+                                });
+                            });
+                        },
+                        prefill: {
+                            name: name,
+                            email: email,
+                            contact: phone
+                        },
+                        theme: {
+                            color: "#3399cc"
+                        }
+                    };
+                    console.log(options)
+                    const rzp = new Razorpay(options);
+                    rzp.open();
+                })
+                .catch(error => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Unable to initiate payment. Please try again.',
+                        timer: 3000,
+                        showConfirmButton: false,
+                        toast: true,
+                        position: 'bottom'
+                    });
+                });
+        }
+        
+    });
+});
+
+</script>
+<% if (bonusMessage) { %>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Swal.fire({
+                icon: 'success',
+                title: 'Congratulations!',
+                text: '<%= bonusMessage %>', // Display the bonus message
+                timer: 3000,
+                showConfirmButton: false,
+                position: 'bottom',
+                toast: true,
+                background: '#4CAF50',
+                color: '#ffffff',
+                customClass: {
+                    popup: 'animated slideInDown'
+                }
+            });
+        });
+    </script>
+     <% } %>

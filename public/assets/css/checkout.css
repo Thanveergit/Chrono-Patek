@@ -1,0 +1,174 @@
+/* No inner or outer border for input fields */
+/* No inner or outer border for input fields */
+.bor8, .form-control {
+    border: none; /* Remove inner and outer border */
+    border-radius: 10px; /* Keeps the rounded corners */
+    padding: 10px;
+    background-color: #f8f9fa; /* Light background for input fields */
+    color: #333;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Placeholder color and background effect */
+.form-control::placeholder {
+    color: #666; /* Placeholder text color */
+    background-color: #fff; /* Placeholder background color */
+    padding-left: 5px; /* Slight padding for placeholder text */
+}
+
+/* Set the background color to white when there's no input */
+.form-control:not(:focus):placeholder-shown {
+    background-color: #fff; /* White background when placeholder is visible */
+}
+
+/* Focused Input - white background for active typing */
+.form-control:focus {
+    background-color: #fff; /* White background when typing */
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.2); /* Soft glow effect on focus */
+}
+
+/* Remove any outline on focus */
+.form-control:focus-visible {
+    outline: none;
+}
+
+/* Curved border for the Address Collapse section */
+#addressCollapse, .existing-addresses {
+    border-radius: 10px; /* Curved border for these sections */
+    padding: 15px;
+    background-color: #f8f9fa; /* Light background for distinction */
+    margin-bottom: 20px;
+}
+
+/* Button styling */
+.btn-link {
+    font-size: 16px;
+    text-decoration: none;
+    color: #007bff;
+    transition: color 0.3s ease;
+}
+
+.btn-link:hover {
+    color: #0056b3;
+}
+
+.btn-primary, .btn-secondary {
+    border-radius: 8px; /* Rounded corners for buttons */
+}
+
+/* Address Labels and Inputs */
+.existing-addresses label {
+    display: block;
+    padding: 10px;
+    border-radius: 10px; /* Curved label */
+    background-color: #fff; /* White background for labels */
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.existing-addresses label:hover {
+    background-color: #f1f1f1; /* Change background color on hover */
+}
+
+/* Button Styles */
+.btn {
+    padding: 10px 20px; /* Increase padding for a button-like feel */
+    font-size: 16px; /* Set a font size for better visibility */
+    font-weight: bold; /* Make text bold for prominence */
+    border: none; /* Remove any default borders */
+    border-radius: 25px; /* Rounded corners */
+    color: #fff; /* White text color */
+    background-color: #222; /* Primary button color */
+    transition: background-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
+    text-decoration: none; /* Remove underline */
+}
+
+/* Button hover effects */
+.btn:hover {
+    background-color: #717fe0; /* Darker shade on hover */
+}
+
+/* Additional style for the button with icon */
+.btn i {
+    margin-left: 5px; /* Space between text and icon */
+}
+
+/* Card Styles */
+.card {
+    background-color: #fff; /* White background for the card */
+    border: 1px solid #e0e0e0; /* Light gray border */
+    border-radius: 10px; /* Rounded corners for the card */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+    .card {
+        margin: 15px 0; /* Add margin for spacing on small screens */
+    }
+}
+
+/* Adjust View Address button styling */
+#viewAddress {
+    padding: 5px 10px; /* Make the button smaller */
+    font-size: 14px; /* Adjust font size */
+    float: left; /* Move the button to the left side */
+    margin-bottom: 20px; /* Add margin for spacing */
+    width: 150px; /* Set a fixed width for the button */
+}
+/* Form Container */
+#addAddressForm {
+    display: none; /* Hidden by default, controlled by JavaScript */
+    border-radius: 10px; /* Rounded corners for the form */
+    padding: 20px; /* Padding inside the form */
+    background-color: #f8f9fa; /* Light background color for the form */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
+    margin-top: 20px; /* Space above the form */
+}
+
+/* Form Group */
+.form-group {
+    margin-bottom: 15px; /* Spacing between form groups */
+}
+
+/* Labels */
+.form-group label {
+    font-weight: bold; /* Bold text for labels */
+    color: #333; /* Dark color for labels */
+}
+
+/* Input Fields */
+.form-control {
+    border: none; /* Remove default border */
+    border-radius: 5px; /* Slightly rounded corners */
+    padding: 10px; /* Padding inside the input */
+    background-color: #ffffff; /* White background for inputs */
+    color: #333; /* Dark text color */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transitions */
+}
+
+/* Input Focus State */
+.form-control:focus {
+    border: 1px solid #007bff; /* Blue border on focus */
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Soft blue glow */
+    outline: none; /* Remove default outline */
+}
+
+/* Error Messages */
+.text-danger {
+    font-size: 12px; /* Smaller font size for error messages */
+    display: block; /* Ensures error message takes up space */
+    margin-top: 5px; /* Space between input and error message */
+}
+
+/* Media Queries for Responsiveness */
+@media (max-width: 576px) {
+    #addAddressForm {
+        padding: 15px; /* Less padding on smaller screens */
+    }
+
+    .form-control {
+        padding: 8px; /* Less padding for inputs */
+    }
+}

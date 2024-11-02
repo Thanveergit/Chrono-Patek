@@ -1,0 +1,220 @@
+<%-include("../layout/adminHeader")%>
+<%-include("../layout/adminSidebarHead")%>
+
+<div class="main-panel">
+     <div class="content-wrapper">
+         <div class="page-header pt-5">
+             <h3 class="page-title">
+                 <span class="page-title-icon bg-gradient-primary text-white mr-2">
+                     <i class="mdi mdi-chart-line"></i>
+                 </span>
+                 Sales Report
+             </h3>
+             <nav aria-label="breadcrumb">
+                 <ul class="breadcrumb">
+                     <li class="breadcrumb-item active" aria-current="page"></li>
+                 </ul>
+             </nav>
+         </div>
+   
+         <div class="row">
+             <div class="col-lg-12 grid-margin stretch-card">
+                 <div class="card">
+                     <div class="card-body table-responsive">
+                         <div class="row">
+                             <div class="col-lg-12 mb-4 d-flex justify-content-between">
+                              <form class="form-inline" onsubmit="return validateForm()">
+                                   <div class="form-group mr-3">
+                                       <label for="startDate">Start Date:</label>
+                                       <input type="date" class="form-control mx-2" id="startDate" name="startDate"  required>
+                                   </div>
+                                   <div class="form-group mr-3">
+                                       <label for="endDate">End Date:</label>
+                                       <input type="date" class="form-control mx-2" id="endDate" name="endDate"  required>
+                                   </div>
+                                   <button type="submit" class="btn btn-gradient-light text-black" id="filterBtn">Filter</button>
+                               </form>
+                                 <div class="form-group mr-3">
+                                     <select class="form-control mx-2" id="interval" onchange="filterInterval()" style="width: 200px;">
+                                         <option value="" disabled selected>Select an interval</option>
+                                         <option value="daily">Daily</option>
+                                         <option value="weekly">Weekly</option>
+                                         <option value="monthly">Monthly</option>
+                                         <option value="yearly">Yearly</option>
+                                     </select>
+                                 </div>
+                             </div>
+                         </div>
+                         <button type="button" class="btn btn-danger btn-sm mr-2" id="downloadPdfBtn">
+                             <i class="mdi mdi-file-pdf"></i> Download as PDF
+                         </button>
+                         <button type="button" class="btn btn-success btn-sm" id="downloadExcelBtn">
+                             <i class="mdi mdi-file-excel-box"></i> Download as Excel
+                         </button>                        
+                         <br><br>
+ 
+                         <div class="row">
+                             <div class="col-md-6">
+                                 <h5 id="totalSales">Total Sales:<%=totalSales%></h5>
+                                 <h5 id="totalSales">Total Amount:<%=totalAmount%></h5>
+                                 <h5 id="totalSales">Total Descount:<%=totalDiscount%></h5>
+                             </div>
+                         </div>                        
+                         
+                         <table class="table table-bordered border-top table-hover mt-2" style="width: 100%">
+                             <thead>
+                                 <tr>
+                                     <th>Date</th>
+                                     <th>Product Name</th>
+                                     <th>Quantity</th>
+                                     <th>Billing Name</th>
+                                     <th>Total Price</th>
+                                     <th>Discount Price</th>
+                                     <th>Payment Method</th>
+                                 </tr>
+                             </thead>
+                             <tbody>
+                              <% orders.forEach(order=>{%>
+                                 <tr>
+                                     <td><%=order.date.toDateString()%></td>
+                                     <td><%=order.items.productName%></td>
+                                     <td><%= order.items.quantity %></td>
+                                     <td><%= order.address.name%></td>
+                                     <td><%= order.totalPrice%></td>
+                                     <td><%= order.items.finalPrice%></td>
+                                     <td><%= order.paymentMethod%></td>
+                                 </tr> 
+                                 <%})%>
+                             </tbody>                            
+                         </table>
+                         <div class="pagination-container mt-4">
+                            <ul class="pagination justify-content-center">
+                                <% if (currentPage > 1) { %>
+                                <li class="page-item">
+                                    <a class="page-link page-link-custom" href="?page=<%= currentPage - 1 %>" style="background-color: #fff; border-color: #000000; color: #000;">Previous</a>
+                                </li>
+                                <% } %>
+                                <% for(let i = 1; i <= totalPages; i++) { %>
+                                 <li class="page-item <%= i === currentPage ? 'bg-dark text-light' : 'btn-light text-dark' %>" style="border-color: #000;">
+                                    <a class="page-link page-link-custom <%= i === currentPage ? 'bg-dark text-light' : 'btn-light text-dark' %>" href="?page=<%= i %>" style="border-color: #000;"><%= i %></a>
+                                </li>
+                                <% } %>
+                                <% if (currentPage < totalPages) { %>
+                                <li class="page-item">
+                                    <a class="page-link page-link-custom" href="?page=<%= currentPage + 1 %>" style="background-color: #fff; border-color: #000; color: #000;">Next</a>
+                                </li>
+                                <% } %>
+                            </ul>
+                     </div>
+                 </div>
+             </div>
+         </div>
+     </div>
+     
+    </div>
+ </div>
+<%-include("../layout/adminFooter")%>
+<%-include("../layout/adminSidebarFooter")%>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.3/xlsx.full.min.js"></script>
+
+<script>
+    // Download PDF functionality
+    const { jsPDF } = window.jspdf;
+
+    document.getElementById('downloadPdfBtn').addEventListener('click', function () {
+    const doc = new jsPDF();
+    let title = document.querySelector('.page-title').innerText;
+
+    // Get values for total sales, amount, and discount
+    let totalSales = document.getElementById('totalSales').innerText;
+    let totalAmount = document.querySelector('h5:nth-child(2)').innerText;
+    let totalDiscount = document.querySelector('h5:nth-child(3)').innerText;
+
+    // Add title, total sales, total amount, and total discount to the PDF
+    doc.text(title, 10, 10);
+    doc.text(totalSales, 10, 20);
+    doc.text(totalAmount, 10, 30);
+    doc.text(totalDiscount, 10, 40);
+
+    // Get the table and convert to PDF
+    let table = document.querySelector('table');
+    doc.autoTable({
+        html: table,
+        startY: 50, // Start below the summary
+    });
+
+    // Save the PDF
+    doc.save('Sales_Report.pdf');
+});
+
+document.getElementById('downloadExcelBtn').addEventListener('click', function () {
+    var wb = XLSX.utils.book_new();
+    var table = document.querySelector('table');
+    var ws = XLSX.utils.table_to_sheet(table);
+
+    // Add a new row for totals at the bottom of the table
+    let totalSales = document.getElementById('totalSales').innerText;
+    let totalAmount = document.querySelector('h5:nth-child(2)').innerText;
+    let totalDiscount = document.querySelector('h5:nth-child(3)').innerText;
+
+    // Find the last row of the sheet
+    let lastRow = XLSX.utils.decode_range(ws['!ref']).e.r + 1;
+
+    // Add total sales, amount, and discount values in a new row
+    XLSX.utils.sheet_add_aoa(ws, [
+        ['Total Sales:', totalSales],
+        ['Total Amount:', totalAmount],
+        ['Total Discount:', totalDiscount]
+    ], { origin: -1 }); // Add at the end of the sheet
+
+    // Adjust the column width for all columns
+    ws['!cols'] = [
+        { wch: 15 }, 
+        { wch: 20 }, 
+        { wch: 10 }, 
+        { wch: 25 }, 
+        { wch: 15 }, 
+        { wch: 15 }, 
+        { wch: 15 }
+    ];
+
+    XLSX.utils.book_append_sheet(wb, ws, 'Sales Report');
+    XLSX.writeFile(wb, 'Sales_Report.xlsx');
+});
+
+function filterInterval() {
+        let interval = document.getElementById("interval").value;
+        window.location.href = `/admin/filterInterval?interval=${interval}`;
+    }
+
+    function filter() {
+        let startDate = document.getElementById("startDate").value;
+        let endDate = document.getElementById("endDate").value;
+        window.location.href = `/admin/filter?startDate=${startDate}&endDate=${endDate}`;
+    }
+
+    function validateForm() {
+        event.preventDefault();
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+
+        if (!startDate || !endDate) {
+            Swal.fire('Both start date and end date are required');
+            return false;
+        }
+
+        if (new Date(startDate) >= new Date(endDate)) {
+            Swal.fire('Start date must be less than the end date');
+            return false;
+        }
+
+        filter();
+    }
+
+
+
+</script>

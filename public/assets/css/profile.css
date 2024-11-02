@@ -1,0 +1,150 @@
+#manageAddressBtn,
+#editProfileBtn,
+#myOrdersBtn,
+#walletBtn,
+#signOutBtn {
+    border-radius: 20px;
+    padding: 10px;
+    text-align: center;
+    text-decoration: none;
+    display: block;
+    color: #ffffff;
+    font-size: 13px;
+    font-family:'Poppins-Regular';
+}
+
+
+#manageAddressBtn:hover,
+#editProfileBtn:hover,
+#myOrdersBtn:hover,
+#walletBtn:hover {
+    background-color: #717fe0;
+}
+
+#signOutBtn:hover{
+    background-color: #a40000;
+}
+
+.card-body{
+    border-radius: 20px;
+}
+
+.customeremailptag {
+    font-weight: 600;
+}
+
+.customerphoneptag{
+    font-weight: 600;
+}
+
+.container {
+    margin-bottom: 20px;
+}
+
+
+
+@media (max-width: 768px) {
+    .container {
+        width: 90%;
+    }
+}
+
+#customerProfileCard {
+    border-radius: 10px;
+    border-color: rgba(0, 255, 255, 0.223);
+}
+
+
+
+/* Edit profile modal */
+.modal-content {
+    max-width: 65%;
+    margin: 0 auto;
+    border-radius: 5px;
+    background-color: #fff;
+    padding: 20px;
+}
+    
+/* Modal Form input styles */
+.modal-content input[type="text"],
+.modal-content button {
+    margin-bottom: 10px;
+    padding: 10px;
+    font-size: 12px;
+    font-family: 'Poppins-Regular';
+}
+    
+/* Modal Save and Cancel buttons */
+#modal-btn-update {
+    background-color: #222;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+}
+    
+#modal-btn-update:hover {
+    background-color: #717fe0;
+}
+    
+.modal-content .btn-secondary {
+    background-color: #6c757d;
+}
+    
+.modal-content .btn-secondary:hover {
+    background-color: #545b62;
+}
+    
+.modal-content label {
+    font-size: 14px;
+    font-family: 'Poppins-Regular';
+}
+    
+.modal-content .form-control {
+    border-radius: 10px;
+    height: 35px;
+    width: 100%;
+}
+    
+.modal-content .form-control::placeholder {
+    color: #999;
+}
+
+.modal-content .close {
+    color: rgb(47, 47, 47);
+    opacity: 1;
+    font-size: 1.2rem;
+    padding: 8px;
+    opacity: 1;
+}
+
+/* userProfile.css */
+
+@media (max-width: 767.98px) {
+    #breadcrumb-container {
+        padding-top: 0 !important;
+    }
+    .container {
+        width: 90% !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+    .container.pb-lg-5 {
+        padding-bottom: 0 !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .modal-dialog {
+        max-width: 100%;
+        margin: 10px auto;
+    }
+
+    .modal-content {
+        padding: 15px;
+    }
+    
+    .modal-content .form-control {
+        height: 40px;
+    }
+}
+

@@ -1,0 +1,357 @@
+  <%- include("../layout/adminHeader")%>
+  <%- include("../layout/adminSidebarHead")%>
+
+  <style>
+    .table th, .table td {
+      text-align: center;
+      vertical-align: middle;
+    }
+    .table th, .table td:nth-child(1) { width: 10%; }
+    .table th, .table td:nth-child(2) { width: 30%; }
+    .table th, .table td:nth-child(3) { width: 30%; }
+  </style>
+
+  <div class="main-panel">
+    <div class="content-wrapper">
+      <div class="page-header pt-5">
+        <h3 class="page-title">
+          <span class="page-title-icon btn-gradient-primary text-white mr-2">
+            <i class="mdi mdi-tag-multiple"></i>
+          </span>
+          Brand
+        </h3>
+        <nav aria-label="breadcrumb">
+          <ul class="breadcrumb">
+            <li class="breadcrumb-item active" aria-current="page">
+              <button id="addBrandModalBtn" class="btn btn-outline-github" data-toggle="modal" data-target="#addBrandModal">Add Brand</button>
+            </li>
+          </ul>
+        </nav>
+        <form class="d-flex">
+          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="search" value="<%= searchQuery %>"/>
+          <button class="btn btn-gradient-dark" type="submit">Search</button>
+        </form>
+      </div>
+
+      <div class="col-lg-12 grid-margin stretch-card">
+        <div class="card">
+          <div class="card-body">
+            <%if (data.length>0){%>
+            <table class="table table-bordered table-hover">
+              <thead>
+                <tr>
+                  <th>S.No</th>
+                  <th>Brand Name</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% data.reverse().forEach((brand, index) => { %>
+                  <tr id="brand-<%= brand._id %>">
+                    <td><%= index + 1 %></td>
+                    <td><%= brand.brandName %></td>
+                    <td>
+                      <% if (brand.isDeleted) { %>
+                        <button type="button" class="btn btn-success btn-sm" onclick="restoreBrand('<%= brand._id %>')">Restore</button>
+                      <% } else { %>
+                        <button type="button" class="btn btn-danger btn-sm" onclick="deleteBrand('<%= brand._id %>')">Delete</button>
+                      <% } %>
+                    </td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+            <%} else{%>
+              <div class="text-center mt-4">
+                <h5>No such orders found.</h5>
+                <div class="mt-3">
+                    <a href="/admin/brands" class="btn-sm btn-inverse-dark" style="text-decoration: none;">Go Back</a>
+                </div>
+            </div>
+            <%}%>
+          </div>
+        </div>
+      </div>
+      <div class="pagination-container mt-4">
+        <ul class="pagination justify-content-center">
+            <% if (currentPage > 1) { %>
+            <li class="page-item">
+                <a class="page-link page-link-custom" href="?page=<%= currentPage - 1 %>" style="background-color: #fff; border-color: #000000; color: #000;">Previous</a>
+            </li>
+            <% } %>
+            <% for(let i = 1; i <= totalPages; i++) { %>
+             <li class="page-item <%= i === currentPage ? 'bg-dark text-light' : 'btn-light text-dark' %>" style="border-color: #000;">
+                <a class="page-link page-link-custom <%= i === currentPage ? 'bg-dark text-light' : 'btn-light text-dark' %>" href="?page=<%= i %>" style="border-color: #000;"><%= i %></a>
+            </li>
+            <% } %>
+            <% if (currentPage < totalPages) { %>
+            <li class="page-item">
+                <a class="page-link page-link-custom" href="?page=<%= currentPage + 1 %>" style="background-color: #fff; border-color: #000; color: #000;">Next</a>
+            </li>
+            <% } %>
+        </ul>
+    </div>
+    </div>
+
+
+    <%- include("../layout/adminFooter")%>
+    <%- include("../layout/adminSidebarFooter")%>
+
+    <!-- Add Brand Modal -->
+    <div class="modal fade" id="addBrandModal" tabindex="-1" role="dialog" aria-labelledby="addBrandModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="addBrandModalLabel">Add Brand</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <form id="addBrandForm" method="post" action="/admin/brands">
+            <div class="modal-body">
+              <div class="form-group">
+                <label for="brandName">Brand Name</label>
+                <input type="text" class="form-control" id="brandName" name="name">
+                <div id="brandNameValidationMsg" style="display: none; color: red; font-size: small;"></div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+              <button type="submit" class="btn btn-success">Add Brand</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+
+document.addEventListener('DOMContentLoaded', function() {
+  const addBrandForm = document.getElementById('addBrandForm');
+  const brandNameInput = document.getElementById('brandName');
+  const brandNameValidationMsg = document.getElementById('brandNameValidationMsg');
+
+  addBrandForm.addEventListener('submit', function(event) {
+    event.preventDefault();
+    
+    const brandName = brandNameInput.value.trim();
+    
+    // Improved validation regex
+    const validBrandNameRegex = /^[a-zA-Z0-9\s&-]{4,}$/;
+    
+    if (!validBrandNameRegex.test(brandName)) {
+      brandNameValidationMsg.style.display = 'block';
+      brandNameValidationMsg.textContent = 'Brand name must contain at least 4 characters and can only include letters, numbers, spaces, "&", and "-".';
+    } else {
+      brandNameValidationMsg.style.display = 'none';
+      
+      // Use fetch to submit the form
+      fetch('/admin/brands', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name: brandName }),
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Close the modal
+          $('#addBrandModal').modal('hide');
+          
+          // Show success message
+          Swal.fire('Success!', data.message, 'success').then(() => {
+            // Reload the page to show the new brand
+            window.location.reload();
+          });
+        } else {
+          // Show error message
+          Swal.fire('Error!', data.message, 'error');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        Swal.fire('Error!', 'An unexpected error occurred. Please try again.', 'error');
+      });
+    }
+  });
+
+  // Optional: Provide real-time feedback as user types
+  brandNameInput.addEventListener('input', function() {
+    const brandName = this.value.trim();
+    const validBrandNameRegex = /^[a-zA-Z0-9\s&-]{4,}$/;
+    
+    if (!validBrandNameRegex.test(brandName)) {
+      brandNameValidationMsg.style.display = 'block';
+      brandNameValidationMsg.textContent = 'Please enter valid Name..';
+    } else {
+      brandNameValidationMsg.style.display = 'none';
+    }
+  });
+});
+
+// function for deleteBrand
+function deleteBrand(brandId) {
+  Swal.fire({
+    title: 'Are you sure?',
+    text: "Do you really want to delete this brand?",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'Yes, delete!',
+    cancelButtonText: 'Cancel'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      fetch(`/admin/deleteBrand?id=${brandId}`, { 
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      .then(response => {
+        if (!response.ok) throw new Error('Network response was not ok');
+        return response.json();
+      })
+      .then(data => {
+        if (data.success) {
+          Swal.fire('Deleted!', 'The brand has been deleted.', 'success')
+            .then(() => {
+              // Reload the page to ensure the changes are reflected
+              window.location.reload(); 
+            });
+        } else {
+          Swal.fire('Error!', data.message || 'Something went wrong, please try again.', 'error');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        Swal.fire('Error!', 'Something went wrong, please try again.', 'error');
+      });
+    }
+  });
+}
+// fuction for restoreBrand
+function restoreBrand(brandId) {
+  Swal.fire({
+    title: 'Are you sure?',
+    text: "Do you want to restore this brand?",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#28a745',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'Yes, restore!',
+    cancelButtonText: 'Cancel'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      fetch(`/admin/restoreBrand?id=${brandId}`, { 
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          // If you're using CSRF protection, include the token here
+          // 'CSRF-Token': 'your-csrf-token'
+        },
+      })
+      .then(response => {
+        if (!response.ok) throw new Error('Network response was not ok');
+        return response.json();
+      })
+      .then(data => {
+        if (data.success) {
+          Swal.fire('Deleted!', 'The brand has been restored.', 'success')
+            .then(() => {
+              // Reload the page to ensure the changes are reflected
+              window.location.reload(); 
+            });
+        } else {
+          Swal.fire('Error!', data.message || 'Something went wrong, please try again.', 'error');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        Swal.fire('Error!', 'Something went wrong, please try again.', 'error');
+      });
+    }
+  });
+}
+
+
+
+      // function deleteBrand(brandId) {
+      //   Swal.fire({
+      //     title: 'Are you sure?',
+      //     text: "Do you really want to delete this brand?",
+      //     icon: 'warning',
+      //     showCancelButton: true,
+      //     confirmButtonColor: '#d33',
+      //     cancelButtonColor: '#3085d6',
+      //     confirmButtonText: 'Yes, delete!',
+      //     cancelButtonText: 'Cancel'
+      //   }).then((result) => {
+      //     if (result.isConfirmed) {
+      //       fetch(`/admin/deleteBrand?id=${brandId}`, { method: 'POST' })
+      //         .then(response => {
+      //           if (!response.ok) {
+      //             throw new Error('Network response was not ok');
+      //           }
+      //           return response.json();
+      //         })
+      //         .then(data => {
+      //           if (data.success) {
+      //             const brandElement = document.querySelector(`#brand-${brandId}`);
+      //             if (brandElement) {
+      //               brandElement.remove();
+      //             }
+      //             Swal.fire('Deleted!', 'The brand has been deleted.', 'success');
+      //           } else {
+      //             Swal.fire('Error!', 'Something went wrong, please try again.', 'error');
+      //           }
+      //         })
+      //         .catch(err => {
+      //           console.error('Error:', err);
+      //           Swal.fire('Error!', 'Something went wrong, please try again.', 'error');
+      //         });
+      //     }
+      //   });
+      // }
+
+      // function restoreBrand(brandId) {
+      //   Swal.fire({
+      //     title: 'Are you sure?',
+      //     text: "Do you want to restore this brand?",
+      //     icon: 'warning',
+      //     showCancelButton: true,
+      //     confirmButtonColor: '#28a745',
+      //     cancelButtonColor: '#3085d6',
+      //     confirmButtonText: 'Yes, restore!',
+      //     cancelButtonText: 'Cancel'
+      //   }).then((result) => {
+      //     if (result.isConfirmed) {
+      //       fetch(`/admin/restoreBrand?id=${brandId}`, { method: 'POST' })
+      //         .then(response => {
+      //           if (!response.ok) {
+      //             throw new Error('Network response was not ok');
+      //           }
+      //           return response.json();
+      //         })
+      //         .then(data => {
+      //           if (data.success) {
+      //             const brandStatus = document.querySelector(`#brand-${brandId} .status`);
+      //             if (brandStatus) {
+      //               brandStatus.innerText = 'Active';
+      //             }
+      //             Swal.fire('Restored!', 'The brand has been restored.', 'success');
+      //           } else {
+      //             Swal.fire('Error!', 'Something went wrong, please try again.', 'error');
+      //           }
+      //         })
+      //         .catch(err => {
+      //           console.error('Error:', err);
+      //           Swal.fire('Error!', 'Something went wrong, please try again.', 'error');
+      //         });
+      //     }
+      //   });
+      // }
+    </script>
+  </div>

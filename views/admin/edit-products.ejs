@@ -1,0 +1,443 @@
+<%- include("../layout/adminHeader") %>
+<%- include("../layout/adminSidebarHead") %>
+
+<div class="main-panel">
+  <div class="content-wrapper">
+    <div class="page-header pt-5">
+      <h3 class="page-title">
+        <span class="page-title-icon btn-gradient-primary text-white mr-2">
+          <i class="mdi mdi-pencil menu-icon"></i>
+        </span>Edit Product
+      </h3>
+      <nav aria-label="breadcrumb">
+        <ul class="breadcrumb">
+          <li class="breadcrumb-item active" aria-current="page">
+            <span></span>
+            <button class="btn btn-outline-github" onclick="location.href='/admin/products'">Back to Products</button>
+          </li>
+        </ul>
+      </nav>
+    </div>
+
+    <div class="col-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+
+          <!------EDIT PRODUCT FORM------>          
+          <form class="forms-sample" method="post" enctype="multipart/form-data" onsubmit="return validateForm(event)"> 
+
+            <!-- Grid Layout for Two Parts -->
+            <div class="form-grid">
+              
+              <!-- SECTION 1: Product Name, Category, Brand, Images -->
+              <div class="form-grid-part">
+                <!-- Name -->
+                <div class="form-group"> 
+                  <label for="productName">Product Name</label>
+                  <input type="text" class="form-control" id="productName" name="productName" value="<%= product.productName %>" placeholder="Enter the Product Name">
+                  <small id="productNameError" class="text-danger"></small>
+                </div>
+
+                <!-- Category -->
+                <div class="form-group">
+                  <label for="category">Category</label>
+                  <select class="form-control" id="category" name="categoryName">
+                    <option disabled selected value="">Nothing selected</option>
+                    <% let activeCategories= category.filter(cat=> cat.isListed)
+                      for(let i=0;i<activeCategories.length; i++){ %>
+                        <option value="<%= activeCategories[i].name %>" 
+                            <% if (product.category._id.toString() === activeCategories[i]._id.toString()) { %> 
+                                selected 
+                            <% } %>>
+                        <%= activeCategories[i].name %>
+                    </option>
+                    <% } %>
+                  </select>
+                  <small id="categoryError" class="text-danger"></small>
+                </div>
+
+                <!-- Brand -->
+                <div class="form-group">
+                  <label for="brand">Brand</label>
+                  <select class="form-control" id="brand" name="brandName">
+                    <option disabled selected value="">Nothing selected</option>
+                    <% let activeBrands= brand.filter(brand=> brand.isDeleted==false)
+                        for(let i=0;i<activeBrands.length;i++){%>
+                            <option value="<%= activeBrands[i].brandName %>" 
+                                <% if (product.brand._id.toString() === activeBrands[i]._id.toString()) { %> 
+                                    selected 
+                                <% } %>>
+                            <%= activeBrands[i].brandName %>
+                        </option>
+                      
+                    <% } %>
+                  </select>
+                  <small id="brandError" class="text-danger"></small>
+                </div>
+
+                <!-- Image Upload Section -->
+                <div class="form-group">
+                  <label for="productImages">Product Images</label>
+                  <div class="image-upload-grid">
+                    <!-- Image 1 -->
+                    <div class="image-item">
+                      <input type="file" name="image1" class="file-upload-default uploadImages" accept="image/*" onchange="previewImage(event)" id="image1Input">
+                      <input type="hidden" value="<%= product.image[0] %>" id="existingImage1" >
+                      <div class="input-group col-xs-12">
+                        <input type="text" class="form-control file-upload-info" disabled placeholder="Upload Image 1">
+                        <span class="input-group-append">
+                          <button class="file-upload-browse btn btn-inverse-dark" type="button" onclick="document.getElementById('image1Input').click()">Upload</button>
+                        </span>
+                      </div>
+                      <img id="image1Preview" class="img-preview" src="/uploads/product-images/<%= product.image[0] %>" />
+                      <small id="image1Error" class="text-danger"></small>
+                    </div>
+
+                    <!-- Image 2 -->
+                    <div class="image-item">
+                        <input type="file" name="image2" class="file-upload-default uploadImages" accept="image/*" onchange="previewImage(event)" id="image2Input">
+                        <input type="hidden" value="<%= product.image[1] %>" id="existingImage2"  >
+                      <div class="input-group col-xs-12">
+                        <input type="text" class="form-control file-upload-info" disabled placeholder="Upload Image 2">
+                        <span class="input-group-append">
+                          <button class="file-upload-browse btn btn-inverse-dark" type="button" onclick="document.getElementById('image2Input').click()">Upload</button>
+                        </span>
+                      </div>
+                      <img id="image2Preview" class="img-preview" src="/uploads/product-images/<%= product.image[1] %>" />
+                      <small id="image2Error" class="text-danger"></small>
+                    </div>
+
+                    <!-- Image 3 -->
+                    <div class="image-item">
+                        <input type="file" name="image3" class="file-upload-default uploadImages" accept="image/*" onchange="previewImage(event)"  id="image3Input">
+                        <input type="hidden" value="<%= product.image[2] %>" id="existingImage3"  >
+                        <div class="input-group col-xs-12">
+                        <input type="text" class="form-control file-upload-info" disabled placeholder="Upload Image 3">
+                        <span class="input-group-append">
+                          <button class="file-upload-browse btn btn-inverse-dark" type="button" onclick="document.getElementById('image3Input').click()">Upload</button>
+                        </span>
+                      </div>
+                      <img id="image3Preview" class="img-preview" src="/uploads/product-images/<%= product.image[2] %>" />
+                      <small id="image3Error" class="text-danger"></small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- END OF SECTION 1 -->
+
+              <!-- SECTION 2: Quantity, Price, Description, Highlights, Product Details -->
+              <div class="form-grid-part">
+                <!-- Quantity -->
+                <div class="form-group">
+                  <label for="quantity">Quantity</label>
+                  <input type="number" class="form-control" id="quantity" name="quantity" value="<%= product.quantity %>" placeholder="Enter quantity" min="1">
+                  <small id="quantityError" class="text-danger"></small>
+                </div>
+                <input type="hidden" name="id" value="<%= product._id %>">
+                <!-- Price -->
+                <div class="form-group">
+                  <label for="price">Price</label>
+                  <input type="text" class="form-control" id="price" name="price" value="<%= product.price %>" placeholder="Enter Price">
+                  <small id="priceError" class="text-danger"></small>
+                </div>
+
+                <!-- Product Description -->
+                <div class="form-group">
+                  <label for="productDescription">Product Description</label>
+                  <textarea class="form-control" id="productDescription" name="productDescription" placeholder="Enter Product Description"><%= product.productDesc %></textarea>
+                  <small id="productDescriptionError" class="text-danger"></small>
+                </div>
+
+                <!-- Highlights -->
+                <div class="form-group">
+                  <label for="highlights">Highlights</label>
+                  <textarea class="form-control" id="highlights" name="highlights" placeholder="Enter Highlights"><%= product.highlights %></textarea>
+                  <small id="highlightsError" class="text-danger"></small>
+                </div>
+
+                <!-- Product Details -->
+                <div class="form-group">
+                  <label for="productDetails">Product Details</label>
+                  <textarea class="form-control" id="productDetails" name="productDetails" placeholder="Enter Product Details"><%= product.productDetails %></textarea>
+                  <small id="productDetailsError" class="text-danger"></small>
+                </div>
+
+                <button type="submit" class="btn btn-gradient-primary mr-2">Update Product</button>
+                <button class="btn btn-inverse-dark">Cancel</button>
+              </div>
+              <!-- END OF SECTION 2 -->
+
+            </div> <!-- End of Form Grid -->
+          </form>
+        </div>
+
+        <%- include("../layout/adminFooter") %>
+        <%- include("../layout/adminSidebarFooter") %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal for cropping -->
+<div id="cropperModal" class="modal">
+  <div class="modal-content">
+      <div class="cropper-container">
+          <img id="cropperImage" src="" alt="Image for cropping" />
+      </div>
+      <button onclick="cropImage()">Crop</button>
+      <button onclick="closeModal()">Cancel</button>
+  </div>
+</div>
+
+<style>
+  .modal-content {
+      margin: 10% auto;
+      padding: 20px;
+      width: 80%;
+      max-width: 600px;
+      background-color: #363636;
+  }
+  .cropper-container {
+      width: 100%;
+      max-height: 400px;
+      margin-bottom: 10px;
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Two equal columns */
+    gap: 40px; /* Space between the two parts */
+  }
+
+  .form-grid-part {
+    padding: 20px;
+  }
+
+  .image-upload-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* Three columns for the images */
+    gap: 20px;
+  }
+
+  .image-item {
+    position: relative;
+    text-align: center;
+  }
+
+  .img-preview {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    margin-top: 10px;
+  }
+</style>
+
+
+<link href="https://unpkg.com/cropperjs/dist/cropper.css" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+<script src="https://unpkg.com/cropperjs"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+  let cropper;
+let currentInput;
+let currentPreviewId;
+let croppedFiles = new Map(); 
+
+function previewImage(event) {
+    const input = event.target;
+    const file = input.files[0];
+    currentInput = input; 
+    currentPreviewId = `${input.name}Preview`; 
+
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const cropperImage = document.getElementById('cropperImage');
+            cropperImage.src = e.target.result;
+            document.getElementById('cropperModal').style.display = 'block';
+            if (cropper) {
+                cropper.destroy();
+            }
+            cropper = new Cropper(cropperImage, {
+                aspectRatio: 1, 
+                viewMode: 1,
+                scalable: true,  // Enable scaling
+                zoomable: true,  // Enable zooming
+                responsive: true // Make the cropper responsive to screen size
+            });
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+function cropImage() {
+    if (cropper) {
+        // Get the original image's dimensions to maintain resolution
+        const imageData = cropper.getImageData();
+        const aspectRatio = imageData.width / imageData.height;
+
+        // Determine the crop dimensions, but scale it up
+        const canvasWidth = 1000;  // Adjust this as needed (higher means better quality)
+        const canvasHeight = canvasWidth / aspectRatio; // Maintain the original aspect ratio
+
+        cropper.getCroppedCanvas({
+            width: canvasWidth,
+            height: canvasHeight,
+            imageSmoothingEnabled: true, // Enable smoothing to improve quality
+            imageSmoothingQuality: 'high' // Set smoothing quality to 'high'
+        }).toBlob(function(blob) {
+            const croppedImageSrc = URL.createObjectURL(blob);
+
+            // Get the preview container and image element
+            const previewContainer = document.getElementById(currentPreviewId);
+            if (previewContainer) {
+                previewContainer.src = croppedImageSrc;
+                previewContainer.style.display = 'block'; 
+            }
+
+            // Replace the file input with the cropped image blob
+            const dataTransfer = new DataTransfer();
+            const file = new File([blob], `croppedImage_${Date.now()}.jpg`, { type: "image/jpeg" });
+            dataTransfer.items.add(file);
+            currentInput.files = dataTransfer.files;
+
+            // Store the cropped file in the Map
+            croppedFiles.set(currentInput.name, file);
+
+            closeModal();
+        }, 'image/jpeg', 0.95);  // Use 0.95 compression quality to avoid losing details
+    }
+}
+
+function closeModal() {
+    document.getElementById('cropperModal').style.display = 'none';
+    if (cropper) {
+        cropper.destroy();
+        cropper = null;
+    }
+}
+
+  async function validateForm(event) {
+    event.preventDefault();
+
+    let productName = document.getElementById('productName').value.trim();
+    let quantity = document.getElementById('quantity').value.trim();
+    let price = document.getElementById('price').value.trim();
+    let productDescription = document.getElementById('productDescription').value.trim();
+    let highlights = document.getElementById('highlights').value.trim();
+    let productDetails = document.getElementById('productDetails').value.trim();
+    let imageInputs = document.querySelectorAll(".uploadImages");
+    let category = document.getElementById('category').value;
+    
+
+    let nameRegex = /^[a-zA-Z0-9\s]+$/;
+    let numberRegex = /^\d+$/;
+    // let priceRegex = /^(\d{1,3}(,\d{3})*(\.\d{1,2})?|\d+(\.\d{1,2})?)$/;
+    let isValid = true;
+
+    // Clear previous error messages
+    document.getElementById('productNameError').innerText = '';
+    document.getElementById('quantityError').innerText = '';
+    document.getElementById('priceError').innerText = '';
+    document.getElementById('productDescriptionError').innerText = '';
+    document.getElementById('image1Error').innerText = '';
+    document.getElementById('image2Error').innerText = '';
+    document.getElementById('image3Error').innerText = '';
+    document.getElementById('categoryError').innerText = '';
+    document.getElementById('highlightsError').innerText = ''; 
+    document.getElementById('productDetailsError').innerText = '';
+
+    // Validate fields
+    // if (!nameRegex.test(productName)) {
+    //     document.getElementById('productNameError').innerText = 'Product Name must be alphanumeric';
+    //     isValid = false;
+    // }
+
+    if (!category) {
+        document.getElementById('categoryError').innerText = 'Category is required';
+        isValid = false;
+    }
+
+    if (!quantity.match(numberRegex) || quantity <= 0) {
+        document.getElementById('quantityError').innerText = 'Quantity should be at least 1';
+        isValid = false;
+    }
+
+    if ( price <= 0) {
+        document.getElementById('priceError').innerText = 'Price must be a number greater than 0';
+        isValid = false;
+    }
+
+    if (productDescription.length === 0) {
+        document.getElementById('productDescriptionError').innerText = 'Product Description is required';
+        isValid = false;
+    }
+
+    if (highlights.length === 0) {
+        document.getElementById('highlightsError').innerText = 'Highlights are required';
+        isValid = false;
+    }
+
+    if (productDetails.length === 0) {
+        document.getElementById('productDetailsError').innerText = 'Product Details are required';
+        isValid = false;
+    }
+
+    
+
+   // If form is valid, submit it
+if (isValid) {
+    const formData = new FormData(event.target);
+    imageInputs.forEach((input, index) => {
+    if (input.files.length > 0) {
+        // formData.append(`image${index + 1}`, input.files[0]);
+    } else {
+        formData.append(`existingImage${index + 1}`, document.getElementById(`existingImage${index + 1}`).value);
+    }
+});
+
+    try {
+        const response = await axios.post('/admin/editProduct', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+
+        if (response.data.success  ) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: 'Product update successfully',
+                timer: 2000,
+                showConfirmButton: false
+            }).then(() => {
+                window.location.href = '/admin/products';
+            });
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: response.data.message
+            });
+        }
+    } catch (error) {
+        console.error('Error adding product:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error!',
+            text: 'Error editing product.'
+        });
+    }
+} else {
+    return false;
+}
+
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+  
+});
+
+</script>

@@ -1,0 +1,113 @@
+<%- include("../layout/adminHeader") %>
+<%- include("../layout/adminSidebarHead") %>
+
+<div class="main-panel">
+    <div class="content-wrapper">
+
+        <div class="page-header pt-5">
+            <h3 class="page-title">
+                <span class="page-title-icon btn-gradient-primary text-white mr-2">
+                    <i class="mdi mdi-tag-multiple menu-icon"></i>
+                </span>
+                Add Category
+            </h3>
+            <nav aria-label="breadcrumb">
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item active" aria-current="page">
+                        <span></span>
+                        <button class="btn btn-outline-github" onclick="location.href='/admin/category'">Go Back</button>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <div class="col-12 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <br/><br />
+
+                    <form id="addCategoryForm" class="forms-sample">
+                        <div class="form-group">
+                            <label for="exampleInputName1" class="pb-3">Category Name</label>
+                            <p style="display: none; color: red;" id="errorMsg">Category already exists</p>
+                            <input type="text" class="form-control" id="exampleInputName1" name="categoryName" placeholder="Enter the Category Name" />
+                            
+                            
+                            <br><div id="nameValidationMsg" style="display: none; color: red; font-size: small; ">Please enter a valid category name.</div>
+                        </div>
+                        <button type="submit" class="btn btn-success mr-2">Add</button>
+                        <button type="button" class="btn btn-danger" onclick="cancelForm()">Cancel</button>
+                    </form>
+                    
+
+                </div>
+            </div>
+        </div>  
+
+        <%- include("../layout/adminSidebarFooter") %>
+        <%- include("../layout/adminFooter") %>
+    </div>
+    <!-- page-body-wrapper ends -->
+</div>
+<!-- content-wrapper ends -->
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('addCategoryForm');
+
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const categoryNameInput = document.getElementById('exampleInputName1');
+            const categoryName = categoryNameInput.value.trim();
+
+            if (!isValidCategoryName(categoryName)) {
+                document.getElementById('nameValidationMsg').style.display = 'block';
+                return;
+            }
+
+            axios.post('/admin/addNewCategory', { categoryName })
+                .then(function(response) {
+                    if (response.status === 200) {
+                        console.log(response.data.message);
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success!',
+                            text: response.data.message
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = '/admin/category';
+                            }
+                        });
+                        form.reset();
+                    }
+                })
+                .catch(function(error) {
+                    if (error.response.status === 400) {
+                        console.log(error.response.data.message);
+                        document.getElementById('errorMsg').style.display = 'block';
+                    } else {
+                        console.error('Error:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Something went wrong!'
+                        });
+                    }
+                });
+        });
+
+        function isValidCategoryName(name) {
+            return /^[a-zA-Z0-9\s\-]{3,}$/.test(name);
+        }
+    });
+
+    function cancelForm() {
+        window.location.href = '/admin/category';
+    }
+
+    
+</script>

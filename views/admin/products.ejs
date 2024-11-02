@@ -1,0 +1,234 @@
+<%- include("../layout/adminHeader") %>
+<%- include("../layout/adminSidebarHead") %>
+
+<style>
+/* .swal2-popup {
+    font-size: 14px;
+    max-width: 320px;
+    padding: 1.16rem;
+    max-height: 300px !important;
+}
+
+.swal2-title {
+    font-size: 15px !important;
+}
+
+.swal2-content {
+    font-size: 12px !important;
+}
+
+.swal2-confirm,
+.swal2-cancel {
+    padding: 8px 16px;
+    font-size: 14px;
+}
+.swal2-icon.swal2-warning {
+    font-size: 10px;
+} */
+</style>
+
+<div class="main-panel">
+    <div class="content-wrapper">
+        <div class="page-header pt-5">
+            <h3 class="page-title">
+                <span class="page-title-icon btn-gradient-primary text-white mr-2">
+                    <i class="mdi mdi-cube-outline menu-icon"></i>
+                </span>Products
+            </h3>
+            <nav aria-label="breadcrumb">
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item active" aria-current="page">
+                        <span></span>
+                        <button class="btn btn-outline-github" onclick="location.href='/admin/addProducts'">Add Product</button>
+                    </li>
+                </ul>
+            </nav>
+            <form class="d-flex">
+                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="search" value="<%= searchQuery %>"/>
+                <button class="btn btn-gradient-dark" type="submit">Search</button>
+            </form>
+        </div>
+
+        <div class="col-lg-12 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body table-responsive">
+
+                    <table class="table table-bordered border-top table-hover" style="width: 100%">
+                        <thead class="text-center">
+                            <tr>
+                                <th>Product Name</th> 
+                                <th>Image</th>
+                                <th>Category</th>
+                                <th>Brand</th> <!-- Added Brand Column -->
+                                <th>Quantity</th>
+                                <th>Price</th>
+                                <th>Added Date</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% if(products.length > 0) { for(let i = 0; i < products.length; i++) { %>
+                            <tr class="text-center">
+                                <td style="
+                                    max-width: 250px;
+                                    overflow-wrap: break-word;
+                                    word-wrap: break-word;
+                                    white-space: normal;
+                                    line-height: 1.5;
+                                    font-family: sans-serif;
+                                ">
+                                <%= products[i].productName %>
+                                </td>
+                                <td>
+                                    <img src="/uploads/product-images/<%= products[i].image[0] %>" style="width: 100px; height: auto; border-radius: 0" />
+                                </td>                        
+                                <td><%= products[i].category.name %></td>
+                                <td><%=  products[i].brand.brandName %></td>
+                                <td><%= products[i].quantity %></td>
+                                <td><%= products[i].price %></td>
+                                <td><%= products[i].addedDate.toLocaleDateString()%></td>
+                                <td>
+                                    <a href="/admin/editProduct/?id=<%= products[i]._id %>" 
+                                        class="btn btn-gradient-dark edit-btn" 
+                                        data-id="<%= products[i]._id %>" 
+                                        data-name="<%= products[i].productName %>">
+                                        Edit
+                                    </a>
+                                    <% if (products[i].status === "active") { %>
+                                        <button class="btn-sm btn-gradient-danger status-btn"  onclick="unlistProduct('<%= products[i]._id %>')">Inactive</button>
+                                    <% } else { %>
+                                        <button class="btn-sm btn-gradient-success status-btn" onclick="listProduct('<%= products[i]._id %>')">Active</button>
+                                    <% } %>
+                                </td>                                                            
+                            </tr>
+                            <% } } else { %>
+                            <tr>
+                                <td colspan="8" class="text-center"> 
+                                     No such product found
+                                    <div class="mt-4">
+                                        <a href="/admin/products" class="btn-sm btn-inverse-dark" style="text-decoration: none;">Go Back</a>
+                                    </div>
+                                </td>
+                            </tr>
+                          <% } %>
+                        </tbody>
+                    </table>
+
+                </div>
+
+                <div class="pagination-container mt-4">
+                    <ul class="pagination justify-content-center">
+                        <% if (currentPage > 1) { %>
+                        <li class="page-item">
+                            <a class="page-link page-link-custom" href="?page=<%= currentPage - 1 %>" style="background-color: #fff; border-color: #000000; color: #000;">Previous</a>
+                        </li>
+                        <% } %>
+                        <% for(let i = 1; i <= totalPages; i++) { %>
+                         <li class="page-item <%= i === currentPage ? 'bg-dark text-light' : 'btn-light text-dark' %>" style="border-color: #000;">
+                            <a class="page-link page-link-custom <%= i === currentPage ? 'bg-dark text-light' : 'btn-light text-dark' %>" href="?page=<%= i %>" style="border-color: #000;"><%= i %></a>
+                        </li>
+                        <% } %>
+                        <% if (currentPage < totalPages) { %>
+                        <li class="page-item">
+                            <a class="page-link page-link-custom" href="?page=<%= currentPage + 1 %>" style="background-color: #fff; border-color: #000; color: #000;">Next</a>
+                        </li>
+                        <% } %>
+                    </ul>
+                </div>
+          </div>
+      </div>
+    
+
+  <%- include("../layout/adminSidebarFooter") %>
+  <%- include("../layout/adminFooter") %>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</div>
+    <!-- content-wrapper ends -->
+</div>
+  <!-- main-panel ends -->
+
+<script>
+    // list product
+    function listProduct(productId) {
+        Swal.fire({
+            title: 'Do you want to make this product active?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, make active',
+            cancelButtonText: 'Cancel',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                axios.post(`/admin/listProduct`,{id:productId})
+                    .then((response) => {
+                        if (response.data.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                text: 'Product marked as active successfully.',
+                                confirmButtonText: 'OK'
+                            }).then(() => {
+                                window.location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                text: 'Failed to mark product as active. Please try again.',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    })
+                    .catch((error) => {
+                        console.error(error);
+                        Swal.fire({
+                            icon: 'error',
+                            text: 'An error occurred while trying to mark product as active. Please try again.',
+                            confirmButtonText: 'OK'
+                        });
+                    });
+            }
+        });
+    }
+
+    //unlist product
+    function unlistProduct(productId) {
+        Swal.fire({
+            title: 'Do you want to make this product inactive?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, make inactive',
+            cancelButtonText: 'Cancel',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                axios.post(`/admin/unListProduct`,{id:productId})
+                .then((response) => {
+                    if (response.data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            text: 'Product marked as inactive successfully.',
+                            confirmButtonText: 'OK'
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            text: 'Failed to mark product as inactive. Please try again.',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                })
+                .catch((error) => {
+                    console.error(error);
+                    Swal.fire({
+                        icon: 'error',
+                        text: 'An error occurred while trying to mark product as inactive. Please try again.',
+                        confirmButtonText: 'OK'
+                    });
+                });
+            }
+        });
+    }
+</script>

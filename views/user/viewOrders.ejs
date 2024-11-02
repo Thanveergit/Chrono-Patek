@@ -1,0 +1,121 @@
+<%-include("../layout/commonHeader")%>
+<!-- CSS -->
+<link rel="stylesheet" href="/assets/css/viewOrders.css">
+
+<!-- Breadcrumb -->
+<div class="container p-t-75" id="breadcrumb-container">
+    <div class="bread-crumb flex-w p-l-25 p-r-15 p-t-30 p-lr-0-lg">
+        <a href="/" class="stext-109 cl8 hov-cl1 trans-04">
+            Home
+            <i class="fa fa-angle-right m-l-9 m-r-10" aria-hidden="true"></i>
+        </a>
+        <a href="/profile" class="stext-109 cl8 hov-cl1 trans-04">
+            Profile
+            <i class="fa fa-angle-right m-l-9 m-r-10" aria-hidden="true"></i>
+        </a>
+        <span class="stext-109 cl4">
+            Orders
+        </span>
+    </div>
+</div>
+
+
+<div class="container mt-5">
+
+    <% if (order && order.length > 0) { %>
+        <% order.reverse().forEach(order => { %>
+            <div class="card mt-4">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-12 col-sm-6 col-md-3">
+                            <div>ORDER PLACED</div>
+                            <div><%= new Date(order.date).toDateString() %></div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-3">
+                            <div>TOTAL</div>
+                            <div>&#8377;<%= order.totalPrice.toFixed(2) %></div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-3">
+                            <div>SHIP TO</div>
+                            <div><%= order.address.name %></div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-3">
+                            <div>ORDER # <%= order.orderId %></div>
+                            <div>
+                                <a href="/order-details?orderId=<%= order._id %>">View order details</a> 
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body mt-3">
+                    <% order.items.forEach(item => { %>
+                        <div class="row mb-3">
+                            <div class="col-md-2">
+                                <img src="/uploads/product-images/<%= item.image %>" alt="Product Image" class="img-fluid">
+                            </div>
+                            <!-- name -->
+                            <div class="col-md-8">
+                                <h5 class="viewOrdersPdtName"><%= item.productName %></h5>
+                                <p>Category: <%= item.categoryName %></p>
+                                <p>Quantity: <%= item.quantity %></p>
+                                <% if (item.finalPrice) { %>
+                                    <p>Price : &#8377;<%= item.finalPrice.toFixed(2) %></p>
+                                <% } else { %>
+                                    <p>Price : &#8377;<%= item.price.toFixed(2) %></p>
+                                <% } %> 
+                            </div>
+                            <div class="col-md-2">
+                                <p>Status: <%= item.itemStatus %></p>
+                            </div>
+                        </div>
+                    <% }); %>
+                </div>
+            </div>
+        <% }); %>
+    <% } else { %>
+        <div class="row mt-4 text-center">
+            <div class="col-12">
+                <h5 class="text-dark">No orders found!</h5>
+                <p class="mt-3" style="font-size: 13px;">Explore the shop and find something you like</p>
+                <div>
+                    <img src="/assets/images/icons/No Order history.png" alt="Empty orders" class="empty-cart-img">
+                </div>
+                <a href="/shope" class="text-info">Shop Now</a>
+            </div>
+        </div>
+    <% } %>
+</div>
+
+<div class="pagination-container mt-4">
+    <ul class="pagination justify-content-center">
+        <% if (currentPage > 1) { %>
+        <li class="page-item">
+            <a class="page-link page-link-custom" href="?page=<%= currentPage - 1 %>" style="background-color: #fff; border-color: #000000; color: #000;">
+                <i class="zmdi zmdi-chevron-left"></i>
+            </a>
+        </li>
+        <% } %>
+        <% for(let i = 1; i <= totalPages; i++) { %>
+         <li class="page-item <%= i === currentPage ? 'bg-dark text-light' : 'btn-light text-dark' %>" style="border-color: #000;">
+            <a class="page-link page-link-custom <%= i === currentPage ? 'bg-dark text-light' : 'btn-light text-dark' %>" href="?page=<%= i %>" style="border-color: #000;"><%= i %></a>
+        </li>
+        <% } %>
+        <% if (currentPage < totalPages) { %>
+        <li class="page-item">
+            <a class="page-link page-link-custom" href="?page=<%= currentPage + 1 %>" style="background-color: #fff; border-color: #000; color: #000;">
+                <i class="zmdi zmdi-chevron-right"></i>
+            </a>
+        </li>
+        <% } %>
+    </ul>
+</div>
+
+<%- include("../layout/commonFooter.ejs") %>
+
+<style>
+    @media (max-width: 767.98px) {
+    #breadcrumb-container {
+        padding-top: 0 !important;
+    }
+}
+</style>

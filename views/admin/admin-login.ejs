@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login</title>
+    <link rel="stylesheet" href="/admin/assets/css/login.css"> 
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">  
+</head>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-image: url('/admin/assets/images/pngtree-men-s-luxury-watch-black-banner-image_182858.jpg');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 0;
+    }
+
+</style>
+<body>
+
+    <!-- Logo Section -->
+    <div class="login-container">
+        <a href="/" class="logo">
+            <img src="/assets/images/icons/logo-01.png" alt="IMG-LOGO">
+        </a> 
+
+        <!-- Admin Login Heading -->
+        <h2>Admin Login</h2>
+
+        <!-- Alert for Login Errors -->
+        <% if(locals.message && message.length > 0) { %>
+            <div class="alert alert-danger text-center">
+                <%= message %>
+            </div>
+        <% } %>
+
+        <!-- Login Form -->
+        <form action="/admin/login" method="POST" id="admin-login">
+            <div class="form-group">
+                <input value="admin@gmail.com" type="email" name="email" placeholder="Email Address" class="form-control" id="adminEmail" required>
+                <div id="errorEmail" class="error-message">Invalid Email</div>
+            </div>
+            <div class="form-group">
+                <input value="thanveer123" type="password" name="password" placeholder="Password" class="form-control" id="adminPassword" required>
+                <div id="errorPassword" class="error-message">Invalid Password</div>
+            </div>
+            <button type="submit" class="btn btn-primary">Log In</button>
+        </form>
+
+        
+    </div>
+
+    <!-- Validation Scripts -->
+    <script>
+        const adminEmail = document.getElementById("adminEmail");
+        const adminPassword = document.getElementById("adminPassword");
+        const errorEmail = document.getElementById("errorEmail");
+        const errorPassword = document.getElementById("errorPassword");
+        const adminLogin = document.getElementById("admin-login");
+
+        function validateEmail() {
+            const emailVal = adminEmail.value.trim();
+            const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+
+            if (emailVal === "") {
+                errorEmail.style.display = "block";
+                errorEmail.innerHTML = "Email is required";
+            } else if (!emailPattern.test(emailVal)) {
+                errorEmail.style.display = "block";
+                errorEmail.innerHTML = "Invalid email format";
+            } else {
+                errorEmail.style.display = "none";
+                errorEmail.innerHTML = "";
+            }
+        }
+
+        function validatePassword() {
+            const passwordVal = adminPassword.value.trim();
+
+            if (passwordVal.length < 8) {
+                errorPassword.style.display = "block";
+                errorPassword.innerHTML = "Password must be at least 8 characters long";
+            } else {
+                errorPassword.style.display = "none";
+                errorPassword.innerHTML = "";
+            }
+        }
+
+        adminEmail.addEventListener("input", validateEmail);
+        adminPassword.addEventListener("input", validatePassword);
+
+        adminLogin.addEventListener("submit", function(e) {
+            validateEmail();
+            validatePassword();
+
+            if (errorEmail.style.display === "block" || errorPassword.style.display === "block") {
+                e.preventDefault();
+            }
+        });
+    </script>
+
+</body>
+</html>

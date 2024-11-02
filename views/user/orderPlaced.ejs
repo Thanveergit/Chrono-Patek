@@ -1,0 +1,37 @@
+<%- include("../layout/commonHeader.ejs") %>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<link rel="stylesheet" href="/assets/css/orderSuccess.css">
+
+<!-- breadcrumb -->
+
+
+
+<div class="container">
+     <div class="bread-crumb flex-w p-l-25 p-r-15 p-t-30 p-lr-0-lg">
+         <a href="/" class="stext-109 cl8 hov-cl1 trans-04">
+             Home
+             <i class="fa fa-angle-right m-l-9 m-r-10" aria-hidden="true"></i>
+         </a>
+         <a href="/shope" class="stext-109 cl8 hov-cl1 trans-04">
+             Shop
+             <i class="fa fa-angle-right m-l-9 m-r-10" aria-hidden="true"></i>
+         </a>
+ 
+         <span class="stext-109 cl4">
+            Order Complete
+         </span>
+     </div>
+ </div>
+
+<div class="container mt-1">
+    <div id="editAddressForm">
+    </div>
+</div>
+<div class="text-center">
+    <a href="/viewOrders" class="text-dark" id="ClickToViewOrder">
+        <i id="continueShopping" class="fas fa-box-open"></i>&nbsp;Click to view your order
+    </a>
+</div>
+
+<%- include("../layout/commonFooter.ejs") %>

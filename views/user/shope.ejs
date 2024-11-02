@@ -1,0 +1,521 @@
+<%- include("../layout/commonHeader.ejs")%>
+
+
+
+
+<style>
+	.offer-badge-ribbon {
+	    position: absolute;
+	    top: 10px;
+	    left: -5px;
+	    padding: 5px 10px;
+	    background: #ff0000;
+	    color: #ffffff;
+	    font-size: 12px;
+	    font-weight: bold;
+	    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+	    z-index: 10;
+	}
+	.offer-badge-ribbon:before {
+	    content: "";
+	    position: absolute;
+	    top: 100%;
+	    left: 0;
+	    border-top: 5px solid #cc0000;
+	    border-left: 5px solid transparent;
+	}
+	.original-price {
+	    text-decoration: line-through;
+	    color: #999;
+	    margin-right: 5px;
+	}
+	.offer-price {
+	    color: #ff0000;
+	    font-weight: bold;
+	}
+	.block2-pic:hover .offer-badge-ribbon {
+	    opacity: 1;
+	    visibility: visible;
+	}
+	
+ </style>
+	<!-- Cart -->
+	<div class="wrap-header-cart js-panel-cart">
+		<div class="s-full js-hide-cart"></div>
+
+		<div class="header-cart flex-col-l p-l-65 p-r-25">
+			<div class="header-cart-title flex-w flex-sb-m p-b-8">
+				<span class="mtext-103 cl2">
+					Your Cart
+				</span>
+
+				<div class="fs-35 lh-10 cl2 p-lr-5 pointer hov-cl1 trans-04 js-hide-cart">
+					<i class="zmdi zmdi-close"></i>
+				</div>
+			</div>
+			
+			<div class="header-cart-content flex-w js-pscroll">
+				<ul class="header-cart-wrapitem w-full">
+					<li class="header-cart-item flex-w flex-t m-b-12">
+						<div class="header-cart-item-img">
+							<img src="/assets/images/item-cart-01.jpg" alt="IMG">
+						</div>
+
+						<div class="header-cart-item-txt p-t-8">
+							<a href="#" class="header-cart-item-name m-b-18 hov-cl1 trans-04">
+								White Shirt Pleat
+							</a>
+
+							<span class="header-cart-item-info">
+								1 x $19.00
+							</span>
+						</div>
+					</li>
+
+					<li class="header-cart-item flex-w flex-t m-b-12">
+						<div class="header-cart-item-img">
+							<img src="/assets/images/item-cart-02.jpg" alt="IMG">
+						</div>
+
+						<div class="header-cart-item-txt p-t-8">
+							<a href="#" class="header-cart-item-name m-b-18 hov-cl1 trans-04">
+								Converse All Star
+							</a>
+
+							<span class="header-cart-item-info">
+								1 x $39.00
+							</span>
+						</div>
+					</li>
+
+					<li class="header-cart-item flex-w flex-t m-b-12">
+						<div class="header-cart-item-img">
+							<img src="/assets/images/item-cart-03.jpg" alt="IMG">
+						</div>
+						<div class="header-cart-item-txt p-t-8">
+							<a href="#" class="header-cart-item-name m-b-18 hov-cl1 trans-04">
+								Nixon Porter Leather
+							</a>
+
+							<span class="header-cart-item-info">
+								1 x $17.00
+							</span>
+						</div>
+					</li>
+				</ul>
+				
+				<div class="w-full">
+					<div class="header-cart-total w-full p-tb-40">
+						Total: $75.00
+					</div>
+
+					<div class="header-cart-buttons flex-w w-full">
+						<a href="/cart" class="flex-c-m stext-101 cl0 size-107 bg3 bor2 hov-btn3 p-lr-15 trans-04 m-r-8 m-b-10">
+							View Cart
+						</a>
+
+						<a href="shoping-cart.html" class="flex-c-m stext-101 cl0 size-107 bg3 bor2 hov-btn3 p-lr-15 trans-04 m-b-10">
+							Check Out
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	
+	<!-- Product -->
+	<div class="bg0 m-t-23 p-b-140">
+		<div class="container">
+			
+			<div class="flex-w flex-sb-m p-b-52">
+				<div class="flex-w flex-l-m filter-tope-group m-tb-10">
+					<button class="stext-106 cl6 hov1 bor3 trans-04 m-r-32 m-tb-5 how-active1" onclick="window.location.href='?brandFilter=all'">
+					    All Products
+					</button>
+					<% if (brands) { %>
+					    <% brands.forEach(brand => { %>
+						   <button class="stext-106 cl6 hov1 bor3 trans-04 m-r-32 m-tb-5 brand-filter " onclick="window.location.href='?brandFilter=<%= brand.brand._id %>'">
+							  <%= brand.brand.brandName %>
+						   </button>
+					    <% }) %>
+					<% } %>
+				 </div>
+				 
+				 
+
+				<div class="flex-w flex-c-m m-tb-10">
+					<div class="flex-c-m stext-106 cl6 size-104 bor4 pointer hov-btn3 trans-04 m-r-8 m-tb-4 js-show-filter">
+						<i class="icon-filter cl2 m-r-6 fs-15 trans-04 zmdi zmdi-filter-list"></i>
+						<i class="icon-close-filter cl2 m-r-6 fs-15 trans-04 zmdi zmdi-close dis-none"></i>
+						 Filter
+					</div>
+
+					<div class="flex-c-m stext-106 cl6 size-105 bor4 pointer hov-btn3 trans-04 m-tb-4 js-show-search">
+						<i class="icon-search cl2 m-r-6 fs-15 trans-04 zmdi zmdi-search"></i>
+						<i class="icon-close-search cl2 m-r-6 fs-15 trans-04 zmdi zmdi-close dis-none"></i>
+						Search
+					</div>
+				</div>
+				
+				<!-- Search product -->
+				<div class="dis-none panel-search w-full p-t-10 p-b-15">
+					<div class="bor8 dis-flex p-l-15">
+					    <button id="searchBtn" class="size-113 flex-c-m fs-16 cl2 hov-cl1 trans-04">
+						   <i class="zmdi zmdi-search"></i>
+					    </button>
+					    <input id="searchInput" class="mtext-107 cl2 size-114 plh2 p-r-15" type="text" name="search-product" placeholder="Search" value="<%= searchQuery %>">
+					</div>
+				 </div>
+
+				<!-- Filter -->
+				<div class="dis-none panel-filter w-full p-t-10">
+					<div class="wrap-filter flex-w bg6 w-full p-lr-40 p-t-27 p-lr-15-sm">
+						<div class="filter-col1 p-r-15 p-b-27">
+							<div class="mtext-102 cl2 p-b-15">Sort By</div>
+							<ul id="sort-options">
+							    <li class="p-b-6">
+								   <a href="#" class="filter-link stext-106 trans-04" data-sort="default">Default</a>
+							    </li>
+							    <li class="p-b-6">
+								   <a href="#" class="filter-link stext-106 trans-04" data-sort="newArrival">Newarrival</a>
+							    </li>
+							    <li class="p-b-6">
+								   <a href="#" class="filter-link stext-106 trans-04" data-sort="priceLowToHigh">Price: Low to High</a>
+							    </li>
+							    <li class="p-b-6">
+								   <a href="#" class="filter-link stext-106 trans-04" data-sort="priceHighToLow">Price: High to Low</a>
+							    </li>
+							    <li class="p-b-6">
+								   <a href="#" class="filter-link stext-106 trans-04" data-sort="nameAZ">Name: A to Z</a>
+							    </li>
+							    <li class="p-b-6">
+								   <a href="#" class="filter-link stext-106 trans-04" data-sort="nameZA">Name: Z to A</a>
+							    </li>
+							</ul>
+						 </div>
+
+						<div class="filter-col2 p-r-15 p-b-27">
+							<div class="mtext-102 cl2 p-b-15">
+								Price
+							</div>
+
+							<ul>
+								<li class="p-b-6">
+								    <a href="#" class="filter-link stext-106 trans-04 filter-link-active" data-min="0" data-max="Infinity">
+									   All
+								    </a>
+								</li>
+								<li class="p-b-6">
+								    <a href="#" class="filter-link stext-106 trans-04" data-min="10000" data-max="20000">
+									   ₹10000 - ₹20000
+								    </a>
+								</li>
+								<li class="p-b-6">
+								    <a href="#" class="filter-link stext-106 trans-04" data-min="30000" data-max="40000">
+									   ₹30000 - ₹40000
+								    </a>
+								</li>
+								<li class="p-b-6">
+								    <a href="#" class="filter-link stext-106 trans-04" data-min="50000" data-max="60000">
+									   ₹50000 - ₹60000
+								    </a>
+								</li>
+								<li class="p-b-6">
+								    <a href="#" class="filter-link stext-106 trans-04" data-min="70000" data-max="80000">
+									   ₹70000 - ₹80000
+								    </a>
+								</li>
+								<li class="p-b-6">
+								    <a href="#" class="filter-link stext-106 trans-04" data-min="80000" data-max="Infinity">
+									   ₹80000+
+								    </a>
+								</li>
+							 </ul>
+							 
+						</div>
+						<div class="filter-col4 p-b-27">
+							<div class="mtext-102 cl2 p-b-15">Tags</div>
+							<div class="flex-w p-t-4 m-r--5">
+							    <% Categories.forEach(category => { %>
+								   <a href="?selectedCategories=<%= category._id %>" class="flex-c-m stext-107 cl6 size-301 bor7 p-lr-15 hov-tag1 trans-04 m-r-5 m-b-5">
+									  <%= category.name %>
+								   </a>
+							    <% }) %>
+							</div>
+						 </div>
+						 
+						 
+					</div>
+				</div>
+			</div>
+
+			<div class="row isotope-grid">
+
+				<% if (products.length > 0) { %>
+				    <% products.forEach(product => { %>
+					   <div class="col-sm-6 col-md-4 col-lg-3 p-b-35 isotope-item women">
+						  <!-- Block2 -->
+						  <div class="block2">
+							 <div class="block2-pic hov-img0">
+			 
+								  <!-- Ribbon Offer Price Badge -->
+								  <% if (product.offerPrice) { %>
+									<div class="offer-badge-ribbon">
+									    <span><%= Math.round((product.price - product.offerPrice) / product.price * 100) %>% OFF</span>
+									</div>
+								 <% } %>
+			 
+								<img src="/uploads/product-images/<%= product.image[0] %>" alt="IMG-PRODUCT">
+			 
+								<!-- product button for the image -->
+								<a href="/product?id=<%= product._id %>" class="ab-t-l s-full"></a>
+			 
+								<!-- add to cart button -->
+								<a href="#" class="block2-btn flex-c-m stext-103 cl2 size-102 bg0 bor2 hov-btn1 p-lr-15 trans-04 add-to-cart-btn" data-product-id="<%= product._id %>">
+								    ADD TO CART
+								</a>
+							 </div>
+							 <div class="block2-txt flex-w flex-t p-t-14">
+								<div class="block2-txt-child1 flex-col-l">
+								    <a href="/product?id=<%= product._id %>" class="stext-104 cl4 hov-cl1 trans-04 js-name-b2 p-b-6">
+									   <%= product.productName %>
+								    </a>
+			 
+								    <span class="stext-105 cl3">
+									<% if (product.offerPrice) { %>
+									    <span class="original-price">₹ <%= product.price %></span>
+									    <span class="offer-price">₹ <%= product.offerPrice %></span>
+									<% } else { %>
+									    ₹ <%= product.price %>
+									<% } %>
+								 </span>
+								</div>
+								
+								 
+								 
+							 </div>
+						  </div>
+					   </div>
+				    <% }) %>
+				<% } else { %>
+				    <div class="container-fluid d-flex align-items-center justify-content-center">
+					   <div class="row text-center">
+						  <div class="col-12">
+							 <h5 class="text-dark">No such product found!</h5>
+							 <p class="mt-3" style="font-size: 13px;">Explore the shop and find something you like</p>
+							 <div>
+								<img src="/assets/images/NoProduct.jpg" alt="Empty Cart" style="max-width: 400px;">
+							 </div>
+						  </div>
+					   </div>
+				    </div>
+				<% } %>
+			 
+			 </div>
+			 
+
+			<!-- Load more -->
+			<div class="flex-c-m flex-w w-full p-t-45">
+				<a id="load-more" href="#" class="flex-c-m stext-101 cl5 size-103 bg2 bor1 hov-btn1 p-lr-15 trans-04">
+				    Load More
+				</a>
+			 </div>
+		</div>
+	</div>
+		
+
+	
+
+
+	<!-- Back to top -->
+	<div class="btn-back-to-top" id="myBtn">
+		<span class="symbol-btn-back-to-top">
+			<i class="zmdi zmdi-chevron-up"></i>
+		</span>
+	</div>
+
+	
+
+
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+	
+	<script>
+
+
+
+		// Function to update URL with sortOption and reload the page
+		function updateSortOption(sortOption) {
+		    const urlParams = new URLSearchParams(window.location.search);
+		    urlParams.set('sortOption', sortOption);
+	 
+		    // Update the URL without reloading the page
+		    window.history.replaceState(null, '', '?' + urlParams.toString());
+	 
+		    // Optionally, reload the page to apply sorting
+		    location.reload();
+		}	
+	 
+				// Add event listeners to price range filter links
+			document.querySelectorAll('.filter-link').forEach(link => {
+			link.addEventListener('click', function(e) {
+			e.preventDefault();
+			
+			// Get the min and max prices from the clicked link
+			const minPrice = this.getAttribute('data-min');
+			const maxPrice = this.getAttribute('data-max');
+			
+			// Update the URL with the selected price range
+			updatePriceFilter(minPrice, maxPrice);
+			
+			// Optionally, add active class to the clicked link
+			document.querySelectorAll('.filter-link').forEach(l => l.classList.remove('filter-link-active'));
+			this.classList.add('filter-link-active');
+		});
+		});
+
+		// Function to update URL with price range and reload the page
+		function updatePriceFilter(minPrice, maxPrice) {
+		const urlParams = new URLSearchParams(window.location.search);
+		urlParams.set('minPrice', minPrice);
+		urlParams.set('maxPrice', maxPrice);
+
+		// Update the URL without reloading the page
+		window.history.replaceState(null, '', '?' + urlParams.toString());
+
+		// Reload the page to apply the price filter
+		location.reload();
+		}
+		// Add event listeners to sort options
+		document.querySelectorAll('#sort-options a').forEach(option => {
+		    option.addEventListener('click', function(e) {
+			   e.preventDefault();
+			   const sortOption = this.getAttribute('data-sort');
+			   updateSortOption(sortOption);
+		    });
+		});
+	 
+		// Function to update URL with selected categories and reload the page
+			function updateCategoryFilter(selectedCategory) {
+		   	 const urlParams = new URLSearchParams(window.location.search);
+	 
+		    // Get existing categories from URL and update
+		    let selectedCategories = urlParams.get('selectedCategories') ? urlParams.get('selectedCategories').split(',') : [];
+	 
+		    // Toggle the selected category in the array
+		    if (selectedCategories.includes(selectedCategory)) {
+			   selectedCategories = selectedCategories.filter(category => category !== selectedCategory);
+		    } else {
+			   selectedCategories.push(selectedCategory);
+		    }
+	 
+		    // Update the URL parameter for categories
+		    urlParams.set('selectedCategories', selectedCategories.join(','));
+	 
+		    // Update the URL and reload the page
+		    window.history.replaceState(null, '', '?' + urlParams.toString());
+		    location.reload();
+		}
+	 
+		// Add event listeners to category filters
+			document.querySelectorAll('.category-filter').forEach(link => {
+		   	 link.addEventListener('click', function(e) {
+			   e.preventDefault();
+			   const category = this.getAttribute('data-category');
+			   updateCategoryFilter(category);
+		    });
+		});
+	 </script>
+
+
+	 <script>
+		document.querySelectorAll('.add-to-cart-btn').forEach(button => {
+     	button.addEventListener('click', function(event) {
+       	 event.preventDefault();  
+
+        	const productId = this.getAttribute('data-product-id');
+
+        // Fetch request to add the product to the cart
+        	fetch('/add-to-cart', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ id: productId })
+        	})
+        	.then(response => response.json())
+        	.then(data => {
+            if (data.success) {
+                // SweetAlert2 popup for success
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Added to cart',
+                    text: 'The product has been added to your cart successfully!',
+                    timer: 2000,  
+                    showConfirmButton: false,
+                    position: 'bottom',  
+                    toast: true
+                });
+
+                // Optionally redirect after showing the success message
+                setTimeout(() => {
+                    window.location.href = '/cart';  
+                }, 2000);  
+            } else {
+                // SweetAlert2 popup for error
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: data.message || 'Failed to add the product to the cart',
+                    timer: 3000,  
+                    showConfirmButton: false,
+                    position: 'bottom',  
+                    toast: true
+                });
+            }
+        })
+		.catch(error => {
+			console.error('Error adding to cart:', error);
+			// SweetAlert2 popup for fetch error
+			Swal.fire({
+				icon: 'error',
+				title: 'Error',
+				text: 'Need to login!',
+				timer: 3000,  
+				showConfirmButton: false,
+				position: 'bottom',  
+				toast: true
+			});
+		});
+	});
+	});
+
+	 </script>
+
+	
+
+	 <script>
+		document.getElementById('searchBtn').addEventListener('click', function() {
+		    const searchQuery = document.getElementById('searchInput').value.trim();
+		    if (searchQuery) {
+			   window.location.href = `/shope?searchQuery=${encodeURIComponent(searchQuery)}`; 
+		    } else {
+			   alert('Please enter a search term.');
+		    }
+		});
+	 
+		// Optional: Allow pressing 'Enter' to trigger search
+		document.getElementById('searchInput').addEventListener('keypress', function(event) {
+		    if (event.key === 'Enter') {
+			   document.getElementById('searchBtn').click(); 
+		    }
+		});
+	 </script>
+
+	 
+
+	 
+<script src="/assets/js/main.js"></script>
+	 	
+
+<%- include('../layout/commonFooter.ejs')%>

@@ -1,0 +1,188 @@
+/* Card styles */
+.card {
+     border: 1px solid #ddd;
+     border-radius: 0.25rem;
+     background-color: #fff;
+     padding: 5px;
+     margin: 5px;
+ }
+ 
+ .card-body {
+     padding: 0.5rem;
+ }
+ 
+ .card-title {
+     margin-bottom: 0.25rem;
+     color: #666666;
+     font-size: medium;
+ }
+ 
+ .card-text {
+     margin-bottom: 0.25rem;
+ }
+ 
+ .card-footer {
+     background-color: transparent;
+     border-top: 1px solid #ddd;
+     padding: 0.25rem 0.5rem;
+ }
+ 
+ /* Dashed border for add address card */
+ .border-dashed {
+     border: 2px dashed #ddd;
+ }
+ 
+ /* Flexbox alignment for card header and footer */
+ .card-header, .card-footer {
+     display: flex;
+     justify-content: space-between;
+     align-items: center;
+     padding: 0.25rem 0.5rem;
+ }
+ 
+ .card-header {
+     border-bottom: 1px solid #ddd;
+     background-color: #f8f9fa;
+ }
+ 
+ /* Edit remove button */
+ .btn-link {
+     text-decoration: none;
+     color: #222;
+ }
+ 
+ .btn-link:hover {
+     text-decoration: none;
+     color: #717fe0;
+ }
+ 
+ /* Centering the add address button and text */
+ .card-body-center {
+     display: flex;
+     flex-direction: column;
+     justify-content: center;
+     align-items: center;
+     height: 100%;
+     cursor: pointer;
+     transition: background-color 0.3s, border-color 0.3s;
+ }
+ 
+ /* Button styles */
+ #addressbtn {
+     text-decoration: none;
+     color: #0094a8;
+     cursor: pointer;
+ }
+ 
+ #addressbtn:hover {
+     color: black;
+ }
+ 
+ .display-1 {
+     font-size: 3rem;
+     font-weight: 300;
+     line-height: 1.2;
+     color: #666666;
+ }
+ 
+ .default-card {
+     border: 1px solid#ddd;
+ }
+ 
+ /* Form container */
+ #addAddressForm {
+     max-width: 65%;
+     margin: 0 auto;
+     padding: 20px;
+     /* border: 1px solid #51515138; */
+     border-radius: 5px;
+     background-color: #fff;
+ }
+ 
+ /* Form input styles */
+ #addAddressForm input[type="text"],
+ #addAddressForm button {
+     
+     margin-bottom: 10px;
+     padding: 10px;
+     font-size: 12px;
+     font-family:'Poppins-Regular';
+ }
+ 
+ /* Save and Cancel buttons */
+ #addAddressForm button {
+     background-color: #222;
+     color: #fff;
+     border: none;
+     cursor: pointer;
+ }
+ 
+ #addAddressForm button:hover {
+     background-color: #717fe0;
+ }
+ 
+ #addAddressForm .btn-secondary {
+     background-color: #6c757d;
+ }
+ 
+ #addAddressForm .btn-secondary:hover {
+     background-color: #545b62;
+ }
+ 
+ label {
+     font-size: 14px;
+     font-family:'Poppins-Regular';    
+ }
+ 
+ .form-control {
+     border-radius: 10px;
+     height: 35px;
+ }
+ 
+ .form-control::placeholder {
+     color: #999;    
+ }
+ input::placeholder {
+     font-size: inherit; /* Ensure placeholder inherits font size */
+     color: inherit; /* Ensure placeholder inherits text color */
+     opacity: 1; /* Ensure placeholder is fully visible */
+ }
+ 
+ @media (max-width: 768px) {
+     #addAddressForm {
+         max-width: 100%;
+     }
+ 
+     #addAddressForm input[type="text"],
+     #addAddressForm button {
+         font-size: 12px;
+     }
+ 
+     label {
+         font-size: 14px;
+     }
+ 
+     .form-control {
+         height: 42px;
+     }
+ }
+ 
+ @media (max-width: 767.98px) {
+     #breadcrumb-container {
+         padding-top: 0 !important;
+     }
+ 
+     #addAddressForm,
+     #actualAddAddressForm {
+         width: 100% !important;
+         padding: 0 15px;
+     }
+ 
+     .form-group {
+         width: 100% !important;
+     }
+ 
+     .form-control {
+         width: 100% !important;
+     }
+ }

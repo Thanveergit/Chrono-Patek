@@ -1,0 +1,57 @@
+#editAddressForm {
+     background-image: url('/assets/images/ordersuccess.gif');
+     background-size: contain;
+     background-repeat: no-repeat;
+     background-position: center;
+     width: 100%;
+     height: 500px;
+     display: flex;
+     justify-content: center;
+     align-items: center;
+ }
+ 
+ #ClickToViewOrder {
+     font-size: 14px;
+     color: #333333;
+     font-family: inherit;
+     font-weight: 800;
+     cursor: pointer;
+     position: relative;
+     border: none;
+     background: none;
+     text-transform: uppercase;
+     transition-timing-function: cubic-bezier(0.25, 0.8, 0.25, 1);
+     transition-duration: 400ms;
+     transition-property: color;
+   }
+   
+   #ClickToViewOrder:focus,
+   #ClickToViewOrder:hover {
+     color: #333333;
+   }
+   
+   #ClickToViewOrder:focus:after,
+   #ClickToViewOrder:hover:after {
+     width: 100%;
+     left: 0%;
+   }
+   
+   #ClickToViewOrder:after {
+     content: "";
+     pointer-events: none;
+     bottom: -2px;
+     left: 50%;
+     position: absolute;
+     width: 0%;
+     height: 2px;
+     background-color: #333333;
+     transition-timing-function: cubic-bezier(0.25, 0.8, 0.25, 1);
+     transition-duration: 400ms;
+     transition-property: width, left;
+   }
+   
+   @media (max-width: 767.98px) {
+     #breadcrumb-container {
+         padding-top: 0 !important;
+     }
+ }

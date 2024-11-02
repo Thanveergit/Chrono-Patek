@@ -1,0 +1,134 @@
+<%- include("../layout/adminHeader") %>
+<%- include("../layout/adminSidebarHead")%>
+
+<div class="main-panel">
+  <div class="content-wrapper">
+
+    <div class="page-header pt-5">
+      <h3 class="page-title">
+        <span class="page-title-icon btn-gradient-primary text-white mr-2">
+          <i class="mdi mdi-tag-multiple"></i>
+        </span>
+        Users
+      </h3>
+      
+      <form class="d-flex">
+        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="search" value="<%= searchQuery %>"/>
+        <button class="btn btn-gradient-dark"  type="submit">Search</button>
+      </form>
+    </div>
+
+    <div class="col-lg-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th> First name </th>
+                <th> Status </th>
+                <th> Number </th>
+                <th> Email </th>
+                <th> Action </th>
+              </tr>
+            </thead>
+            <tbody>
+              <% for(let i=0; i<data.length; i++) { %>
+              <tr id="user-<%= data[i]._id %>">
+                <td> <%= data[i].name %> </td>
+                <td id="status-<%= data[i]._id %>">
+                  <% if(data[i].isBlocked==false) { %>
+                    <span class="badge badge-success">Active</span>
+                  <% } else { %>
+                    <span class="badge badge-danger">Inactive</span>
+                  <% } %>
+                </td>
+                <td> <%= data[i].phone %> </td>
+                <td> <%= data[i].email %> </td>
+                <td>
+                  <% if(data[i].isBlocked == false) { %>
+                    <form action="/admin/blockUser" method="POST" style="display:inline;" onsubmit="return confirmBlock(event, this);">
+                      <input type="hidden" name="id" value="<%= data[i]._id %>">
+                      <button type="submit" class="btn btn-danger btn-sm">Block</button>
+                    </form>
+                  <% } else { %>
+                    <form action="/admin/unblockUser" method="POST" style="display:inline;" onsubmit="return confirmUnblock(event, this);">
+                      <input type="hidden" name="id" value="<%= data[i]._id %>">
+                      <button type="submit" class="btn btn-success btn-sm">Unblock</button>
+                    </form>
+                  <% } %>
+                </td>
+              </tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="pagination-container mt-4">
+      <ul class="pagination justify-content-center">
+          <% if (currentPage > 1) { %>
+          <li class="page-item">
+              <a class="page-link page-link-custom" href="?page=<%= currentPage - 1 %>" style="background-color: #fff; border-color: #000000; color: #000;">Previous</a>
+          </li>
+          <% } %>
+          <% for(let i = 1; i <= totalPages; i++) { %>
+           <li class="page-item <%= i === currentPage ? 'bg-dark text-light' : 'btn-light text-dark' %>" style="border-color: #000;">
+              <a class="page-link page-link-custom <%= i === currentPage ? 'bg-dark text-light' : 'btn-light text-dark' %>" href="?page=<%= i %>" style="border-color: #000;"><%= i %></a>
+          </li>
+          <% } %>
+          <% if (currentPage < totalPages) { %>
+          <li class="page-item">
+              <a class="page-link page-link-custom" href="?page=<%= currentPage + 1 %>" style="background-color: #fff; border-color: #000; color: #000;">Next</a>
+          </li>
+          <% } %>
+      </ul>
+  </div>
+  </div>
+
+<%- include("../layout/adminFooter")%>
+<%- include("../layout/adminSidebarFooter")%>
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  function confirmBlock(event, form) {
+    event.preventDefault(); // Prevent the default form submission
+
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "Do you really want to block this user?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, block!',
+      cancelButtonText: 'Cancel'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        form.submit(); // Submit the form if confirmed
+      }
+    });
+  }
+
+  function confirmUnblock(event, form) {
+    event.preventDefault(); // Prevent the default form submission
+
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "Do you really want to unblock this user?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#28a745',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, unblock!',
+      cancelButtonText: 'Cancel'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        form.submit(); // Submit the form if confirmed
+      }
+    });
+  }
+</script>
+

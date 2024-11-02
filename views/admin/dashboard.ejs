@@ -1,0 +1,186 @@
+<%- include("../layout/adminHeader.ejs")%>
+<%- include("../layout/adminSidebarHead")%>
+
+<div class="main-panel">
+  <div class="content-wrapper">
+    <!-- Interval Selection -->
+    <div class="page-header">
+      <h3 class="page-title">
+        <span class="page-title-icon bg-gradient-primary text-white mr-2">
+          <i class="mdi mdi-home"></i>
+        </span> Dashboard
+      </h3>
+      <nav aria-label="breadcrumb">
+        <ul class="breadcrumb">
+          <li class="breadcrumb-item">
+            <select class="form-control" id="intervalSelect" style="width: auto; margin-left: 1rem;" onchange="revenueInterval()">
+              <option value="weekly" <%= interval === 'weekly' ? 'selected' : '' %>>This Week</option>
+              <option value="monthly" <%= interval === 'monthly' ? 'selected' : '' %>>Monthly</option>
+              <option value="yearly" <%= interval === 'yearly' ? 'selected' : '' %>>Yearly</option>
+          </select>
+          
+          </li>
+        </ul>
+      </nav>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row">
+      <div class="col-md-4 stretch-card grid-margin">
+        <div class="card bg-gradient-danger card-img-holder text-white">
+          <div class="card-body">
+            <img src="assets/images/dashboard/circle.svg" class="card-img-absolute" alt="circle-image" />
+            <h4 class="font-weight-normal mb-3">Total Sales <i class="mdi mdi-chart-line mdi-24px float-right"></i></h4>
+            <h2 class="mb-5">₹ <%= revenue.toFixed(2) %></h2>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 stretch-card grid-margin">
+        <div class="card bg-gradient-info card-img-holder text-white">
+          <div class="card-body">
+            <img src="assets/images/dashboard/circle.svg" class="card-img-absolute" alt="circle-image" />
+            <h4 class="font-weight-normal mb-3">Total Orders <i class="mdi mdi-bookmark-outline mdi-24px float-right"></i></h4>
+            <h2 class="mb-5"><%= totalOrders %></h2>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 stretch-card grid-margin">
+        <div class="card bg-gradient-success card-img-holder text-white">
+          <div class="card-body">
+            <img src="assets/images/dashboard/circle.svg" class="card-img-absolute" alt="circle-image" />
+            <h4 class="font-weight-normal mb-3">Discount<i class="mdi mdi-diamond mdi-24px float-right"></i></h4>
+            <h2 class="mb-5">₹<%= discount.toFixed(2) %></h2>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Revenue Chart -->
+    <div class="row">
+      <div class="col-12 grid-margin stretch-card">
+        <div class="card">
+          <div class="card-body">
+            <h4 class="card-title">Revenue Statistics</h4>
+            <canvas id="revenueChart" style="height: 300px;"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Top Products, Categories, and Brands -->
+    <div class="row">
+      <!-- Top Products -->
+      <div class="col-md-4 grid-margin stretch-card">
+        <div class="card">
+          <div class="card-body">
+            <h4 class="card-title">Top Products</h4>
+            <div class="list-group">
+              <% bestProducts.forEach(product => { %>
+                <div class="list-group-item d-flex justify-content-between align-items-center">
+                  <div class="d-flex align-items-center">
+                    <img src="/uploads/product-images/<%= product.image %>" alt="" class="mr-3" style="width: 50px; height: 50px;">
+                    <span><%= product.productName %></span>
+                  </div>
+                  <span class="badge badge-primary badge-pill"><%= product.totalQuantity %></span>
+                </div>
+              <% }); %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Top Categories -->
+      <div class="col-md-4 grid-margin stretch-card">
+        <div class="card">
+          <div class="card-body">
+            <h4 class="card-title">Top Categories</h4>
+            <div class="list-group">
+              <% bestCategories.forEach(category => { %>
+                <div class="list-group-item d-flex justify-content-between align-items-center">
+                  <span><%= category.categoryName %></span>
+                  <span class="badge badge-info badge-pill"><%= category.totalQuantity %></span>
+                </div>
+              <% }); %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Top Brands -->
+      <div class="col-md-4 grid-margin stretch-card">
+        <div class="card">
+          <div class="card-body">
+            <h4 class="card-title">Top Brands</h4>
+            <div class="list-group">
+              <% topBrands.forEach(brand => { %>
+                <div class="list-group-item d-flex justify-content-between align-items-center">
+                  <span><%= brand.brandName %></span>
+                  <span class="badge badge-success badge-pill"><%= brand.totalQuantity %></span>
+                </div>
+              <% }); %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include("../layout/adminFooter.ejs")%>
+<%- include("../layout/adminSidebarFooter")%>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+
+<script>
+   // Sample data - replace with your actual data
+    const labels = <%- JSON.stringify(labels) %>
+    const values = <%- JSON.stringify(values) %>
+
+    // Initialize Revenue Chart
+    const ctx = document.getElementById('revenueChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'bar', // Changed from 'line' to 'bar'
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Revenue',
+          data: values,
+          backgroundColor: '#4CAF50', // Solid color for bars
+          borderColor: '#4CAF50',
+          borderWidth: 1,
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            display: true,
+            position: 'top',
+          }
+        },
+        scales: {
+          x: {
+            title: {
+              display: true,
+              text: 'Month'
+            }
+          },
+          y: {
+            title: {
+              display: true,
+              text: 'Revenue (₹)'
+            },
+            beginAtZero: true
+          }
+        }
+      }
+    });
+</script>
+
+<script>
+   function revenueInterval() {
+    const interval = document.getElementById("intervalSelect").value;
+    window.location.href = "/admin/?interval=" + interval;
+}
+
+  </script>

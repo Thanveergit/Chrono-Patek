@@ -1,0 +1,272 @@
+<%- include("../layout/adminHeader") %>
+<%- include("../layout/adminSidebarHead") %>
+
+<style>
+  .table th,
+  .table td { 
+    text-align: center;
+    vertical-align: middle;
+  }
+
+  .table th,
+  .table td:nth-child(1) {
+    width: 10%;
+  }
+
+  .table th,
+  .table td:nth-child(2) {
+    width: 20%;
+  }
+
+  .table th,
+  .table td:nth-child(3) {
+    width: 20%;
+  }
+
+  .table th,
+  .table td:nth-child(4) {
+    width: 30%;
+  }
+</style>
+
+<div class="main-panel">
+  <div class="content-wrapper">
+    <div class="page-header pt-5">
+      <h3 class="page-title">
+        <span class="page-title-icon btn-gradient-primary text-white mr-2">
+          <i class="mdi mdi-tag-multiple"></i>
+        </span> Category
+      </h3>
+
+      <nav aria-label="breadcrumb">
+        <ul class="breadcrumb">
+          <li class="breadcrumb-item active" aria-current="page">
+            <button id="addCategoryModalBtn" class="btn btn-outline-github" onclick="location.href='/admin/addCategory'" data-toggle="modal" data-target="#addCategoryModal">Add Category</button>
+          </li>
+        </ul>
+      </nav>
+
+      <form class="d-flex">
+        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="search" value=" <%=searchQuery %>"/>
+        <button class="btn btn-gradient-dark" type="submit">Search</button>
+      </form>
+    </div>
+
+    <div class="col-lg-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+         <%if (cat.length>0){%>
+          <table id="categoryTable" class="table table-bordered table-hover">
+            <thead>
+              <tr>
+                <th>S.No</th>
+                <th>Category Name</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% cat.forEach((category, index) => { %>
+                <tr>
+                  <td><%= index + 1 %></td>
+                  <td><%= category.name  %></td>
+                  <td><%= category.isListed ? "Listed" : "Unlisted" %></td>
+                  <td>
+                    <!-- Edit Button -->
+                    <button class="btn-sm btn-gradient-dark edit-btn" data-id="<%= category._id %>" data-name="<%= category.name %>">Edit</button>
+
+                    <% if (category.isListed) { %>
+                      <!-- Unlist Button -->
+                      <button class="btn-sm btn-gradient-danger status-btn" data-action="unlist" data-id="<%= category._id %>" style="width: 100px;">Unlist</button>
+                    <% } else { %>
+                      <!-- List Button -->
+                      <button class="btn-sm btn-gradient-success status-btn" data-action="list" data-id="<%= category._id %>" style="width: 100px;">List</button>
+                    <% } %>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+          <%} else{%>
+            <div class="text-center mt-4">
+              <h5>No such orders found.</h5>
+              <div class="mt-3">
+                  <a href="/admin/category" class="btn-sm btn-inverse-dark" style="text-decoration: none;">Go Back</a>
+              </div>
+          </div>
+          <%}%>
+
+          <!-- Pagination -->
+        </div>
+          <div class="pagination-container mt-4">
+            <ul class="pagination justify-content-center">
+                <li class="page-item">
+                    <a class="page-link page-link-custom" href="?page=1" style="background-color: #fff; border-color: #000; color: #000;">Previous</a>
+                </li>
+                <li class="page-item bg-dark text-light" style="border-color: #000;">
+                    <a class="page-link page-link-custom bg-dark text-light" href="?page=1" style="border-color: #000;">1</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link page-link-custom" href="?page=2" style="background-color: #fff; border-color: #000; color: #000;">Next</a>
+                </li>
+            </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Category Modal -->
+  <div class="modal fade" id="editCategoryModal" tabindex="-1" role="dialog" aria-labelledby="editCategoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editCategoryModalLabel">Edit Category</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <form id="editCategoryForm" method="post">
+          <div class="modal-body">
+            <div class="form-group">
+              <label for="categoryName">Category Name</label>
+              <input type="hidden" id="editCategoryId" name="id">
+              <input type="text" class="form-control" id="editCategoryName" name="name">
+              
+              <p id="errorContainer" style="color: red; display: none;"></p>
+              <div id="nameValidationMsg" style="display: none; color: red; font-size: small;">Please enter a valid category name.</div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-success">Save changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <%- include("../layout/adminFooter") %>
+  <%- include("../layout/adminSidebarFooter") %>
+</div>
+
+<!-- Scripts -->
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+  $(document).ready(function() {
+    // Edit button click event to populate the modal
+    $('.edit-btn').click(function() {
+      var categoryId = $(this).data('id');
+      var categoryName = $(this).data('name');
+      $('#editCategoryId').val(categoryId);
+      $('#editCategoryName').val(categoryName);
+      $('#editCategoryModal').modal('show');
+    });
+
+    // Real-time feedback while typing the category name
+    $('#editCategoryName').on('input', function() {
+      const categoryName = this.value.trim();
+      const validCategoryNameRegex = /^[a-zA-Z0-9\s\-]{3,}$/;
+      
+      if (!validCategoryNameRegex.test(categoryName)) {
+        $('#nameValidationMsg').show().text('Category name must contain at least 3 characters and can only include letters, numbers, spaces, and "-".');
+      } else {
+        $('#nameValidationMsg').hide();
+      }
+    });
+
+    // Form submission with SweetAlert and validation
+    $('#editCategoryForm').submit(function(event) {
+      event.preventDefault();
+
+      const categoryId = $('#editCategoryId').val();
+      const categoryName = $('#editCategoryName').val().trim();
+
+      const validCategoryNameRegex = /^[a-zA-Z0-9\s\-]{3,}$/;
+      if (!validCategoryNameRegex.test(categoryName)) {
+        $('#nameValidationMsg').show().text('Invalid category name.');
+        return;
+      }
+
+      fetch(`/admin/editCategory/${categoryId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name: categoryName }),
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Close the modal
+          $('#editCategoryModal').modal('hide');
+          
+          // Show success message
+          Swal.fire('Success!', data.message, 'success').then(() => {
+            // Reload the page to reflect the edited category
+            window.location.reload();
+          });
+        } else {
+          // Show error message if category exists or any other error occurs
+          Swal.fire('Error!', data.message, 'error');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        Swal.fire('Error!', 'An unexpected error occurred. Please try again.', 'error');
+      });
+    });
+
+    // SweetAlert confirmation for List/Unlist buttons
+    $('.status-btn').click(function(event) {
+    event.preventDefault();
+
+    const categoryId = $(this).data('id');
+    const action = $(this).data('action'); 
+    const actionText = action === 'list' ? 'list this category' : 'unlist this category';
+    const url = action === 'list' ? '/admin/listCategory' : '/admin/unListCategory';
+
+    // Confirmation prompt
+    Swal.fire({
+        title: 'Are you sure?',
+        text: `Do you really want to ${actionText}?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, do it!',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Send POST request via fetch to list/unlist the category
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ id: categoryId }), 
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire('Success!', data.message, 'success').then(() => {
+                        // Reload the page to reflect the change
+                        window.location.reload();
+                    });
+                } else {
+                    Swal.fire('Error!', data.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire('Error!', 'An unexpected error occurred. Please try again.', 'error');
+            });
+        }
+    });
+});
+
+  });
+</script>
