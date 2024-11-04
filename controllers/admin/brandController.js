@@ -2,7 +2,7 @@ const Brand=require("../../models/brandModel")
 const Category = require("../../models/categoryModel")
 const { find } = require("../../models/userModel")
 
-
+// getting the brand page
 const getBrand= async(req,res)=>{
      try {
           const page=parseInt(req.query.page) ||1
@@ -32,6 +32,7 @@ const getBrand= async(req,res)=>{
      }
 }
 
+// adding the brand
 const addBrand = async (req, res) => {
   try {
       const brand = req.body.name.trim();
@@ -65,6 +66,7 @@ const addBrand = async (req, res) => {
   }
 };
 
+// deleting the brand
  const deleteBrand = async (req, res) => {
     try {
       const id = req.query.id;
@@ -79,6 +81,7 @@ const addBrand = async (req, res) => {
   };
   
 
+  // restoring the brand
 const restoreBrand=async(req,res)=>{
     try {
         const id = req.query.id;

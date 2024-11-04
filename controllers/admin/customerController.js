@@ -2,7 +2,7 @@ const User=require("../../models/userModel")
 
 
 
-
+// getting the users details
 const usersDetails= async(req,res)=>{
      try{
           let search=""
@@ -43,6 +43,7 @@ const usersDetails= async(req,res)=>{
      }
 }
 
+//blocking the users
 const userBlocked = async (req, res) => {
      try {
        let id = req.body.id; 
@@ -55,6 +56,7 @@ const userBlocked = async (req, res) => {
      }
    };
    
+   //unblocking the users
    const userUnblocked = async (req, res) => {
      try {
        let id = req.body.id; 

@@ -9,12 +9,13 @@ const RazorPay=require("razorpay");
 const crypto=require("crypto");
 const { deserializeUser } = require("passport");
 
-
+//razorpay instance
 const razorpay=new RazorPay({
      key_id:process.env.RAZORPAY_KEY_ID,
      key_secret:process.env.RAZORPAY_SECRET_KEY,
 
 })
+
 //creating order
 const creatOrder = async (req, res) => {
      try {
@@ -22,7 +23,7 @@ const creatOrder = async (req, res) => {
          if (!userId) {
              return res.status(401).json({ success: false, message: "Unauthorized user" });
          }
- 
+         
          const cartData = await Cart.findOne({ userId }).populate({
              path: 'items.productId',
              populate: [{
@@ -153,6 +154,7 @@ const creatOrder = async (req, res) => {
      }
  };
  
+ //updating the quantities
  const updateProductQuantities = async (items) => {
      for (const item of items) {
          await Product.findByIdAndUpdate(
@@ -209,7 +211,7 @@ const creatOrder = async (req, res) => {
 };
 
 
-
+//razorpay verification
 const verifyRazorpayPayment = (razorpayOrderId, razorpayPaymentId, razorpaySignature) => {
     // The verification process uses HMAC SHA256
     const shasum = crypto.createHmac('sha256', process.env.RAZORPAY_SECRET_KEY);
@@ -228,7 +230,7 @@ const verifyRazorpayPayment = (razorpayOrderId, razorpayPaymentId, razorpaySigna
     }
 };
 
-
+// order failure page
 const orderFailed = async (req, res) => {
     try {
         const userId = req.session.user_id;
@@ -275,7 +277,7 @@ const orderFailed = async (req, res) => {
     }
 };
 
-
+// retry for payment
 const retryPayment = async (req, res) => {
     const { orderId } = req.body;
     console.log("from the body", req.body);

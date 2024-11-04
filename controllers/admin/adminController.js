@@ -323,8 +323,7 @@
     }
 
 
-
-
+//getting the sales report page
     const loadSalesReport = async (req, res) => {
         try {
             const page = parseInt(req.query.page) || 1;
@@ -395,7 +394,7 @@
         }
     }
     
-
+// filtering the sales report
     const filterInterval=async(req,res)=>{
         try {
 
@@ -474,6 +473,7 @@
         }
     }
 
+    //custom filtering for the sales report
     const filterReport = async (req, res, next) => {
         try {
 
@@ -602,6 +602,7 @@
         }
     };
 
+    // approval for the return product 
     const approvalForReturnProduct = async (req, res) => {
         try {
             const { orderId, itemId, status } = req.body;

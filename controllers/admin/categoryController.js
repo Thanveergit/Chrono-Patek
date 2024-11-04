@@ -1,6 +1,7 @@
 const { name } = require("ejs");
 const Category = require("../../models/categoryModel");
 
+// getting the category page
 const categoryDetails = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
@@ -30,6 +31,7 @@ const categoryDetails = async (req, res) => {
     }
 };
 
+// getting the add category page
 const addCategory = async (req, res) => {
    try {
      res.render("add-category")
@@ -38,6 +40,7 @@ const addCategory = async (req, res) => {
    }
 };
 
+//adding the new category
 const addNewCategory=async(req,res)=>{
      try {
           const {categoryName}=req.body
@@ -60,6 +63,7 @@ const addNewCategory=async(req,res)=>{
      }
 }
 
+//listing the category
 const listCategory = async (req, res) => {
     try {
         let { id } = req.body;
@@ -71,6 +75,7 @@ const listCategory = async (req, res) => {
     }
 };
 
+//unlisting the category
 const unListCategory = async (req, res) => {
     try {
         let { id } = req.body;
@@ -83,7 +88,7 @@ const unListCategory = async (req, res) => {
 };
 
 
-
+//updating the category
 const updateCategory = async (req, res) => {
     try {
         const id = req.params.id;
