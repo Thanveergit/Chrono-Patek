@@ -40,9 +40,9 @@
 
             <h2>Login to your Account</h2>
             <form action="/login" method="POST" id="login">
-                <input type="email" name="email" placeholder="Enter Email" id="email" value="thanveermohd95@gmail.com">
+                <input type="email" name="email" placeholder="Enter Email" id="email" >
                 <div id="errorEmail" class="error-message"></div>
-                <input type="password" name="password" placeholder="Password" id="password" value="thanveer123">
+                <input type="password" name="password" placeholder="Password" id="password" >
                 <div id="errorPassword" class="error-message"></div>
                 <% if(locals.message && message.length>0){%>
                     <div class="alert alert-danger text-center">
