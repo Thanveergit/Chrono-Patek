@@ -247,34 +247,49 @@ const loadContact=async(req,res)=>{
 }
 
 //load the product page 
-const loadProduct=async(req,res)=>{
-     try{
-          const id= req.query.id;
-          const userId= req.session.user_id
-          const userData= await User.findOne({_id:userId})
-          const productData= await Product.findOne({_id:id,status:"active"})
-          .populate("category")
-          .populate("brand")
-
-          if (productData){
-               const relatedProducts= await Product.find({
-                    brand:productData.brand._id,
-                    _id:{$ne:id},
-                    status:"active"
-               }).limit(4);
-              
-               res.render("product",{
-                    user:userData,
-                    product:productData,
-                    relatedProducts,
-                    stockQuantity:productData.quantity
-               })
-               console.log(productData);
-          }
-     }catch(error){
-          console.log(error)
+const loadProduct = async (req, res) => {
+     try {
+         const id = req.query.id;
+         const userId = req.session.user_id;
+ 
+         // Check for a valid product ID format (e.g., MongoDB ObjectId)
+         if (!id || !id.match(/^[0-9a-fA-F]{24}$/)) {
+             return res.status(400).json( { message: "Invalid product ID." });
+         }
+ 
+         // Fetch user data
+         const userData = await User.findOne({ _id: userId });
+         
+         // Fetch the product data with necessary checks
+         const productData = await Product.findOne({ _id: id, status: "active" })
+             .populate("category")
+             .populate("brand");
+ 
+         // Handle if product data is not found
+         if (!productData) {
+             return res.status(404).json( { message: "Product not found or inactive." });
+         }
+ 
+         // Fetch related products
+         const relatedProducts = await Product.find({
+             brand: productData.brand._id,
+             _id: { $ne: id },
+             status: "active"
+         }).limit(4);
+ 
+         // Render product page with data
+         return res.render("product", {
+             user: userData,
+             product: productData,
+             relatedProducts,
+             stockQuantity: productData.quantity
+         });
+     } catch (error) {
+         console.error("Error loading product:", error);
+         return res.status(500).render("error", { message: "An unexpected error occurred. Please try again later." });
      }
-}
+ };
+ 
 const loadLogin=async(req,res)=>{
      try{
           res.render("login")
