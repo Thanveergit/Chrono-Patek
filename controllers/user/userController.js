@@ -252,7 +252,7 @@ const loadProduct = async (req, res) => {
          const id = req.query.id;
          const userId = req.session.user_id;
  
-         // Check for a valid product ID format (e.g., MongoDB ObjectId)
+         // Check for a valid product ID format 
          if (!id || !id.match(/^[0-9a-fA-F]{24}$/)) {
              return res.status(400).json( { message: "Invalid product ID." });
          }
