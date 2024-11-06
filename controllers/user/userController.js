@@ -249,7 +249,7 @@ const loadContact=async(req,res)=>{
 //load the product page 
 const loadProduct = async (req, res) => {
      try {
-         const id = req.query.id;
+         const id = req.query.id;  
          const userId = req.session.user_id;
  
          // Check for a valid product ID format 
