@@ -360,8 +360,8 @@ const applyDiscount = async (req, res) => {
    
        // If the coupon is not used, proceed to mark it as used by the user
        await Coupon.updateOne(
-         { _id: couponId }, // Find the coupon by its ID
-         { $push: { usedBy: userId  } } // Add the user to the 'usedBy' array
+         { _id: couponId }, 
+         { $push: { usedBy: userId  } } 
        );
    
        res.json({ success: true, message: "Discount applied successfully" });
