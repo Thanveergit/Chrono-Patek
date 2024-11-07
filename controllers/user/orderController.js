@@ -296,7 +296,7 @@ const retryPayment = async (req, res) => {
 
         // Create a new Razorpay order
         const razorpayOrder = await razorpay.orders.create({
-            amount: order.totalPrice * 100, // Amount in paise
+            amount: order.totalPrice * 100, 
             currency: "INR",
             receipt: orderId.toString(),
             payment_capture: 1,
@@ -305,19 +305,19 @@ const retryPayment = async (req, res) => {
         // Respond with the Razorpay order details and customer information
         res.json({
             success: true,
-            key: process.env.RAZORPAY_KEY_ID, // Your Razorpay key
+            key: process.env.RAZORPAY_KEY_ID, 
             amount: razorpayOrder.amount,
             razorpayOrderId: razorpayOrder.id,
-            name: order.customerName, // Or however you retrieve the name
-            email: order.customerEmail, // Or however you retrieve the email
-            phone: order.customerPhone, // Or however you retrieve the phone
+            name: order.customerName, 
+            email: order.customerEmail, 
+            phone: order.customerPhone, 
         });
 
-        // After the payment is verified (this should be handled in the payment handler)
+        
         // Update order status to 'Success'
-        order.paymentStatus = 'Paid'; // Set the payment status to Success
+        order.paymentStatus = 'Paid'; 
         console.log(order.paymentStatus)
-        await order.save(); // Save the updated order
+        await order.save(); 
 
     } catch (error) {
         console.error('Retry Payment Error:', error);

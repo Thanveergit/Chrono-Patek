@@ -276,7 +276,7 @@ $(document).ready(function() {
 
         if (data.success) {
             // Update the UI to remove the item
-            document.getElementById(`cart-item-${index}`).remove(); // Assuming each cart item has a unique id
+            document.getElementById(`cart-item-${index}`).remove(); 
             updateCartTotal(data.cartTotal, data.itemCount);
             
             // Show a success popup notification
