@@ -18,119 +18,83 @@ const razorpay=new RazorPay({
 
 //creating order
 const creatOrder = async (req, res) => {
-     try {
-         const userId = req.session.user_id;
-         if (!userId) {
-             return res.status(401).json({ success: false, message: "Unauthorized user" });
-         }
-         
-         const cartData = await Cart.findOne({ userId }).populate({
-             path: 'items.productId',
-             populate: [{
-                 path: "category",
-                 model: "Category"
-             },
-            {
-                path:"brand",
-                model:"Brand"
-             }]
-         });
- 
-         const addressId = new mongoose.Types.ObjectId(req.body.selectedAddress);
-         const addressArray = await Address.aggregate([
-             { $unwind: "$address" },
-             { $match: { "address._id": addressId } }
-         ]);
- 
-         if (!addressArray || addressArray.length == 0 || !cartData) {
-             return res.status(400).json({ success: false, message: "Invalid address or empty cart" });
-         }
- 
-         const address = addressArray[0].address;
-         const discountAmount = req.session.appliedDiscount?.discountAmount || 0;
-         console.log(discountAmount)
-         const couponId = req.session.appliedDiscount?.couponId || null;
-         const totalPrice = req.body.totalPrice - discountAmount;
-         console.log(totalPrice)
- 
-         const orderData = {
-             orderId: Math.floor(100000 + Math.random() * 900000).toString(),
-             userId,
-             paymentMethod: req.body.paymentMethod,
-             totalPrice: totalPrice,
-             discount: {
-                 couponId: couponId,
-                 discountAmount: discountAmount
-             },
-             address: {
-                 name: address.name,
-                 phone: address.phone,
-                 district: address.district,
-                 city: address.city,
-                 house: address.house,
-                 state: address.state,
-                 pincode: address.pincode,
-             },
-             items: [],
-             status: "Ordered",
-             date: Date.now()
-         };
- 
-         for (const item of cartData.items) {
-             let finalPrice = item.productId.price;
-             if(item.productId.offerPrice){
-               finalPrice=item.productId.offerPrice
-             }
-             orderData.items.push({
-                 productId: item.productId._id,
-                 productName: item.productId.productName,
-                 categoryName: item.productId.category.name,
-                 brandName:item.productId.brand.brandName,
-                 image: item.productId.image[0],
-                 quantity: item.quantity,
-                 price: item.productId.price,
-                 finalPrice: finalPrice,
-             });
-         }
- 
-         if (orderData.paymentMethod === "cod") {
-             if (req.body.totalPrice > 60000) {
-                 return res.json({ success: false, message: "Cannot place order with COD for amount above 60000" });
-             }
-             orderData.paymentStatus = "pending";
-             
-             // Create and save the order for COD
-             const order = new Order(orderData);
-             const savedOrder = await order.save();
-             
-             // Update product quantities and clear cart
-             await updateProductQuantities(cartData.items);
-             await Cart.findOneAndUpdate({ userId }, { $set: { items: [] } });
-             
-             req.session.appliedDiscount = null;
-             req.session.orderId = savedOrder._id;
- 
-             return res.json({ success: true, message: "Order Placed Successfully.." });
- 
-         } else if (orderData.paymentMethod === "razorpay") {
+    try {
+        const userId = req.session.user_id;
+        if (!userId) {
+            return res.status(401).json({ success: false, message: "Unauthorized user" });
+        }
+
+        const cartData = await Cart.findOne({ userId }).populate({
+            path: 'items.productId',
+            populate: [{ path: "category", model: "Category" }, { path: "brand", model: "Brand" }]
+        });
+
+        const addressId = new mongoose.Types.ObjectId(req.body.selectedAddress);
+        const addressArray = await Address.aggregate([
+            { $unwind: "$address" },
+            { $match: { "address._id": addressId } }
+        ]);
+
+        if (!addressArray || addressArray.length === 0 || !cartData) {
+            return res.status(400).json({ success: false, message: "Invalid address or empty cart" });
+        }
+
+        const address = addressArray[0].address;
+        const discountAmount = req.session.appliedDiscount?.discountAmount || 0;
+        const couponId = req.session.appliedDiscount?.couponId || null;
+        const totalPrice = req.body.totalPrice - discountAmount;
+
+        // Prepare the order data without saving to DB
+        const orderData = {
+            orderId: Math.floor(100000 + Math.random() * 900000).toString(),
+            userId,
+            paymentMethod: req.body.paymentMethod,
+            totalPrice: totalPrice,
+            discount: { couponId, discountAmount },
+            address: { ...address },
+            items: cartData.items.map(item => ({
+                productId: item.productId._id,
+                productName: item.productId.productName,
+                categoryName: item.productId.category.name,
+                brandName: item.productId.brand.brandName,
+                image: item.productId.image[0],
+                quantity: item.quantity,
+                price: item.productId.price,
+                finalPrice: item.productId.offerPrice || item.productId.price,
+            })),
+            status: "Ordered",
+            date: Date.now()
+        };
+
+        if (orderData.paymentMethod === "cod") {
+            if (req.body.totalPrice > 60000) {
+                return res.json({ success: false, message: "Cannot place order with COD for amount above 60000" });
+            }
+            orderData.paymentStatus = "pending";
+
+            const savedOrder = await new Order(orderData).save();
+            await updateProductQuantities(cartData.items);
+            await Cart.findOneAndUpdate({ userId }, { $set: { items: [] } });
+
+            req.session.appliedDiscount = null;
+            req.session.orderId = savedOrder._id;
+            return res.json({ success: true, message: "Order Placed Successfully." });
+
+        } else if (orderData.paymentMethod === "razorpay") {
             const razorpayOrder = await razorpay.orders.create({
                 amount: totalPrice * 100,
                 currency: "INR",
                 receipt: orderData.orderId
             });
-        
-            // Save the order with "pending" payment status before redirecting to Razorpay
-            orderData.paymentStatus = "pending";  // Set initial payment status
-            orderData.razorpayOrderId = razorpayOrder.id;
-        
-            const savedOrder = await new Order(orderData).save();
-        
-            // Store necessary info in session for later verification
+
+            // Store the order details in session without saving to DB
             req.session.pendingOrder = {
-                orderId: savedOrder._id,
+                ...orderData,
+                paymentStatus: "pending",
                 razorpayOrderId: razorpayOrder.id
             };
-        
+            console.log("orderId",req.session.pendingOrder.orderId)
+
             return res.json({
                 success: true,
                 message: "Razorpay order created, redirecting to payment",
@@ -139,20 +103,18 @@ const creatOrder = async (req, res) => {
                 amount: totalPrice * 100,
                 name: req.body.name,
                 email: req.body.email,
-                phone: req.body.phone,
-                orderId: savedOrder._id 
+                phone: req.body.phone
             });
+        } else {
+            return res.status(400).json({ success: false, message: "Invalid payment method" });
         }
-        
-         else {
-             return res.status(400).json({ success: false, message: "Invalid payment method" });
-         }
- 
-     } catch (error) {
-         console.log("order", error);
-         return res.status(500).json({ success: false, message: "Internal server error" });
-     }
- };
+
+    } catch (error) {
+        console.log("order", error);
+        return res.status(500).json({ success: false, message: "Internal server error" });
+    }
+};
+
  
  //updating the quantities
  const updateProductQuantities = async (items) => {
@@ -170,38 +132,30 @@ const creatOrder = async (req, res) => {
         const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = req.body;
         const pendingOrder = req.session.pendingOrder;
 
-        if (!pendingOrder) {
-            return res.status(400).json({ success: false, message: "No pending order found" });
+        if (!pendingOrder || pendingOrder.razorpayOrderId !== razorpay_order_id) {
+            return res.status(400).json({ success: false, message: "No valid pending order found" });
         }
 
-        // Verify the Razorpay payment
         const isValid = verifyRazorpayPayment(razorpay_order_id, razorpay_payment_id, razorpay_signature);
 
-        // Fetch the order by ID to update payment status
-        const order = await Order.findById(pendingOrder.orderId);
-
         if (isValid) {
-            // Payment is valid, update payment status to "paid"
-            order.paymentStatus = "paid";
-            order.razorpayPaymentId = razorpay_payment_id;
-            await order.save();
+            pendingOrder.paymentStatus = "paid";
+            pendingOrder.razorpayPaymentId = razorpay_payment_id;
+
+            const savedOrder = await new Order(pendingOrder).save();
 
             // Update product quantities and clear cart
-            const cartData = await Cart.findOne({ userId: order.userId });
+            const cartData = await Cart.findOne({ userId: pendingOrder.userId });
             await updateProductQuantities(cartData.items);
-            await Cart.findOneAndUpdate({ userId: order.userId }, { $set: { items: [] } });
+            await Cart.findOneAndUpdate({ userId: pendingOrder.userId }, { $set: { items: [] } });
 
             // Clear session data
             req.session.pendingOrder = null;
             req.session.appliedDiscount = null;
-            req.session.orderId = order._id;
+            req.session.orderId = savedOrder._id;
 
             return res.json({ success: true, message: "Payment verified and order placed successfully" });
         } else {
-            // Payment failed; update payment status to "failed"
-            order.paymentStatus = "failed";
-            await order.save();
-
             return res.status(400).json({ success: false, message: "Invalid payment" });
         }
     } catch (error) {
@@ -236,46 +190,52 @@ const orderFailed = async (req, res) => {
         const userId = req.session.user_id;
 
         if (!userId) {
+            console.log("User ID not found in session, redirecting...");
             return res.redirect("/shope");
         }
 
-        // Access orderId from session
-        const orderId = req.session.pendingOrder?.orderId;
+        // Retrieve pending order details from the session
+        const pendingOrder = req.session.pendingOrder;
+        console.log("pendingOrder:",pendingOrder)
 
-        if (!orderId) {
-            return res.status(400).json({ success: false, message: "Order ID not found in session" });
+        if (!pendingOrder) {
+            console.log("No pending order found in session.");
+            return res.status(400).json({ success: false, message: "No pending order found in session" });
         }
 
-        // Find the order by ID
-        const order = await Order.findById(orderId);
+        // Construct the failed order based on pendingOrder details
+        const failedOrderData = {
+            ...pendingOrder,
+            userId,
+            status: "failed",
+            paymentStatus: "failed",
+            items: pendingOrder.items.map(item => ({
+                ...item,
+                itemStatus: "Pending"  // Set individual item status to pending or other appropriate status
+            })),
+            date: Date.now()  // Set the failure date
+        };
 
-        if (!order) {
-            return res.status(404).json({ success: false, message: "Order not found" });
-        }
+        // Create and save the failed order in the database
+        const failedOrder = new Order(failedOrderData);
+        await failedOrder.save();
+        console.log("Failed order saved successfully:", failedOrder);
 
-        // Update order status
-        order.paymentStatus = "failed";
-        order.status = "failed";
-        for (let item of order.items) {
-            item.itemStatus = "Pending";
-            console.log(item.itemStatus)
-        }
-
-        await order.save();
-        
         // Clear session data related to pending orders
         req.session.pendingOrder = null;
 
-        // Fetch user data
+        // Fetch user data for displaying on the failure page
         const userData = await User.findById(userId);
 
-        // Render the order failure page
-        res.render("orderFailure", { user: userData });
+        // Render the order failure page with retry option if needed
+        res.render("orderFailure", { user: userData, order: failedOrder });
+
     } catch (error) {
-        console.error("order failed error:", error);
+        console.error("Order failed error:", error);
         res.status(500).json({ success: false, message: "Internal server error" });
     }
 };
+
 
 // retry for payment
 const retryPayment = async (req, res) => {
