@@ -102,7 +102,7 @@ userRouter.post("/checkout/add-new-address",userAuth.isLogin,cartController.addN
 userRouter.post("/apply-discount",userAuth.isLogin,orderController.applyDiscount)
 userRouter.post("/verify-and-place-order",userAuth.isLogin,orderController.verifyPaymentAndPlaceOrder)
 userRouter.post("/remove-coupon",userAuth.isLogin,orderController.removeCoupon)
-// userRouter.get("/get-used-coupon",userAuth.isLogin,orderController.checkUsedCoupon);
+
 
 //coupon management
 userRouter.get("/check-coupon",userAuth.isLogin,couponController.couponCheck);
