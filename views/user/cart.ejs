@@ -85,12 +85,14 @@
 											  ₹<%= (item.productId.offerPrice ? item.productId.offerPrice : item.productId.price) * item.quantity %>
 										   </span>
 										   <span class="tooltip-container">
-											  <button class="btn-remove-item" 
-													onclick="removeCartItem('<%= item.productId._id %>', '<%= i %>')" 
-													style="border: none; background: none; cursor: pointer;">
-												 <i class="fs-16 zmdi zmdi-close" title="Remove item"></i>
-											  </button>
-										   </span>
+											<button class="btn-remove-item" 
+											    id="remove-button-<%= i %>"
+											    onclick="removeCartItem('<%= item.productId._id %>', '<%= i %>')" 
+											    style="border: none; background: none; cursor: pointer;">
+											    <i class="fs-16 zmdi zmdi-close" title="Remove item"></i>
+											</button>
+										 </span>
+										 
 									    </td>
 									</tr>
 								 <% }) %>
@@ -264,6 +266,11 @@ $(document).ready(function() {
 	<script>
 	async function removeCartItem(productId, index) {
     try {
+        // Show loading state
+        const button = document.getElementById(`remove-button-${index}`);
+        button.disabled = true;
+        button.innerHTML = "Removing..."; 
+
         const response = await fetch('/cart/remove', {
             method: 'DELETE',
             headers: {
@@ -276,23 +283,39 @@ $(document).ready(function() {
 
         if (data.success) {
             // Update the UI to remove the item
-            document.getElementById(`cart-item-${index}`).remove(); 
+            const itemElement = document.getElementById(`cart-item-${index}`);
+            if (itemElement) {
+                itemElement.remove();
+            }
+
+            // Update the cart total and item count
             updateCartTotal(data.cartTotal, data.itemCount);
-            
-            // Show a success popup notification
+
+            // Show success toast message
             Swal.fire({
                 icon: 'success',
-                title: 'Success!',
-                text: 'Item removed from cart successfully!',
-                confirmButtonText: 'OK',
+                title: 'Removed from Wishlist',
+                text: 'Item removed successfully',
+                timer: 2000,
+                showConfirmButton: false,
+                position: 'bottom',
+                toast: true
             });
+
+            // Reload the page after successful item removal
+            setTimeout(() => {
+                window.location.reload(); 
+            }, 1000); 
         } else {
             console.error("Failed to remove item:", data.message);
             Swal.fire({
                 icon: 'error',
                 title: 'Error!',
-                text: data.message,
-                confirmButtonText: 'OK',
+                text: data.message || 'Something went wrong!',
+                timer: 2000,
+                showConfirmButton: false,
+                position: 'bottom',
+                toast: true
             });
         }
     } catch (error) {
@@ -301,10 +324,23 @@ $(document).ready(function() {
             icon: 'error',
             title: 'Error!',
             text: 'An error occurred while trying to remove the item.',
-            confirmButtonText: 'OK',
+            timer: 2000,
+            showConfirmButton: false,
+            position: 'bottom',
+            toast: true
         });
+    } finally {
+        // Re-enable the button after the process completes
+        const button = document.getElementById(`remove-button-${index}`);
+        if (button) {
+            button.disabled = false;
+            button.innerHTML = '<i class="fs-16 zmdi zmdi-close" title="Remove item"></i>';
+        }
     }
 }
+
+
+
 
 function updateCartTotal(cartTotal, itemCount) {
     document.getElementById('cart-total').innerText = `$${cartTotal.toFixed(2)}`;
