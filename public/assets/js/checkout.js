@@ -146,7 +146,7 @@ document.getElementById('placeOrderBtn').addEventListener('click', async functio
                                         });
                 
                                         if (verifyResponse.data.success) {
-                                            window.location.href = "/order-success";
+                                            window.location.href = "/order-success/?id=order-success";
                                         } else {
                                             await handleFailedOrder(orderId);
                                         }
@@ -182,7 +182,7 @@ document.getElementById('placeOrderBtn').addEventListener('click', async functio
                             showConfirmButton: false,
                         });
                         setTimeout(() => {
-                            window.location.href = '/order-success';
+                            window.location.href = '/order-success/?id=order-success';
                         }, 2000);
                 
                     } else {
