@@ -359,6 +359,9 @@ const removeCoupon=async(req,res)=>{
 //rendering to the order success page
 const orderSuccess= async(req,res)=>{
      try {
+        if(!req.query.id){
+            return res.redirect("/");
+        }
           const userData= await User.findOne({_id:req.session.user_id});
           res.render("orderPlaced",{user:userData});
      } catch (error) {
@@ -519,13 +522,13 @@ const returnProduct = async (req, res) => {
         }
 
         // Update order status and payment details
-        order.status = 'failed';  // Change the status to 'Pending'
+        order.status = 'failed';  
         for (let item of order.items) {
-            item.itemStatus = "Ordered";  // Set item status to 'Ordered'
+            item.itemStatus = "Ordered";  
         }
-        order.paymentStatus = 'Success';  // Update payment status to 'Success'
-        order.razorpayPaymentId = paymentId;  // Store the Razorpay payment ID
-        order.razorpaySignature = signature;  // Store the Razorpay signature
+        order.paymentStatus = 'Success';  
+        order.razorpayPaymentId = paymentId;  
+        order.razorpaySignature = signature;  
 
         // Save the updated order
         await order.save();
