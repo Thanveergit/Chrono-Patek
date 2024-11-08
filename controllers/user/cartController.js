@@ -227,7 +227,11 @@ const loadCheckout = async (req, res) => {
                     model: 'Category'
                 }
             });
-
+            
+            if(!cartData ||cartData.items.length==0){
+                
+                return res.redirect("/cart")
+            }
         // Check for quantity consistency and adjust if needed
         if (cartData) {
             cartData.items.forEach(async (item) => {
