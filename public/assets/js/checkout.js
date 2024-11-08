@@ -136,31 +136,28 @@ document.getElementById('placeOrderBtn').addEventListener('click', async functio
                             description: "Order Payment",
                             image: "/assets/images/icons/logo.png",
                             order_id: response.data.razorpayOrderId,
-                            handler: async function (response) {
-                                if (response.razorpay_payment_id) {
+                            handler: async function (paymentResponse) {
+                                if (paymentResponse.razorpay_payment_id) {
                                     try {
                                         const verifyResponse = await axios.post('/verify-and-place-order', {
-                                            razorpay_payment_id: response.razorpay_payment_id,
-                                            razorpay_order_id: response.razorpay_order_id,
-                                            razorpay_signature: response.razorpay_signature,
+                                            razorpay_payment_id: paymentResponse.razorpay_payment_id,
+                                            razorpay_order_id: paymentResponse.razorpay_order_id,
+                                            razorpay_signature: paymentResponse.razorpay_signature,
                                         });
                 
                                         if (verifyResponse.data.success) {
                                             window.location.href = "/order-success";
                                         } else {
-                                            await axios.post('/update-order-status', { orderId, status: 'failed' });
-                                            window.location.href = "/order-failed";
+                                            await handleFailedOrder(orderId);
                                         }
                                     } catch (error) {
-                                        await axios.post('/update-order-status', { orderId, status: 'failed' });
-                                        window.location.href = "/order-failed";
+                                        await handleFailedOrder(orderId);
                                     }
                                 }
                             },
                             modal: {
                                 ondismiss: async function () {
-                                    await axios.post('/update-order-status', { orderId, status: 'failed' });
-                                    window.location.href = "/order-failed";
+                                    await handleFailedOrder(orderId);
                                 }
                             },
                             prefill: {
@@ -175,6 +172,7 @@ document.getElementById('placeOrderBtn').addEventListener('click', async functio
                 
                         const rzp = new Razorpay(options);
                         rzp.open();
+                
                     } else if (selectedPaymentMethod === "cod" && response.data.success) {
                         Swal.fire({
                             icon: 'success',
@@ -186,6 +184,7 @@ document.getElementById('placeOrderBtn').addEventListener('click', async functio
                         setTimeout(() => {
                             window.location.href = '/order-success';
                         }, 2000);
+                
                     } else {
                         Swal.fire({
                             icon: 'error',
@@ -205,6 +204,17 @@ document.getElementById('placeOrderBtn').addEventListener('click', async functio
                         showConfirmButton: false,
                     });
                 }
+                
+                // Helper function to handle failed order updates
+                const handleFailedOrder = async (orderId) => {
+                    try {
+                        await axios.post('/update-order-status', { orderId, status: 'failed' });
+                    } catch (error) {
+                        console.error("Error updating failed order:", error);
+                    }
+                    window.location.href = "/order-failed";
+                };
+                
                   
      });
  
