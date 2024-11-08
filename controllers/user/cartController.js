@@ -21,45 +21,53 @@ function calculateCartTotal(cart){
 
 // getting the cart page with the product
 const loadCart = async (req, res) => {
-     try {
-         // Finding the user
-         const userData = await User.findOne({ _id: req.session.user_id });
- 
-         // Finding the products that the user selected in the cart
-         const cartData = await Cart.findOne({ userId: req.session.user_id })
-             .populate({
-                 path: 'items.productId',
-                 populate: {
-                     path: 'category',
-                     model: 'Category'
-                 }
-             });
- 
-         // Initialize cart count and process effective price
-         let cartCount = 0;
-         if (cartData) {
-             cartCount = cartData.items.length;
- 
-             // Update cart items to include the effective price (offerPrice or regular price)
-             cartData.items.forEach(item => {
-                 const product = item.productId; 
-                 // Determine effective price based on offerPrice
-                 item.effectivePrice = product.offerPrice ? product.offerPrice : product.price; 
-             });
-         }
- 
-         // Render the cart page
-         res.render("cart", {
-             user: userData,
-             cart: cartData,
-             cartCount: cartCount,
-             calculateCartTotal: calculateCartTotal
-         });
-     } catch (error) {
-         console.log("Error loading cart: ", error);
-     }
- };
- 
+    try {
+        // Finding the user
+        const userData = await User.findOne({ _id: req.session.user_id });
+
+        // Finding the cart and populating product details including category
+        const cartData = await Cart.findOne({ userId: req.session.user_id })
+            .populate({
+                path: 'items.productId',
+                populate: {
+                    path: 'category',
+                    model: 'Category'
+                }
+            });
+
+        let cartCount = 0;
+        if (cartData) {
+            cartCount = cartData.items.length;
+
+            // Check if the cart quantity exceeds the available quantity in stock
+            cartData.items.forEach(async (item) => {
+                const product = item.productId;
+
+                // Update effective price based on available offer
+                item.effectivePrice = product.offerPrice ? product.offerPrice : product.price;
+
+                // Check and update quantity if it exceeds stock
+                console.log("product quantity ",product.quantity)
+                if (item.quantity > product.quantity) {
+                    item.quantity = product.quantity;
+
+                    await cartData.save();  
+                }
+            });
+        }
+
+        // Render the cart page
+        res.render("cart", {
+            user: userData,
+            cart: cartData,
+            cartCount: cartCount,
+            calculateCartTotal: calculateCartTotal
+        });
+    } catch (error) {
+        console.log("Error loading cart: ", error);
+        res.status(500).json({ success: false, message: "An error occurred while loading the cart." });
+    }
+};
 
 // adding product to the cart
 const addToCart = async (req, res) => {
@@ -199,33 +207,52 @@ const removeFromCart = async (req, res) => {
  };
 
  // getting the checkout page with the prouduts
- const loadCheckout = async(req,res)=>{
-     try {
-          //finding the user
-          const userData= await User.findOne({_id:req.session.user_id});
-          //finding the coupon
-          const couponData= await Coupon.find();
-          //finding the address
-          const addressData= await Address.findOne({userId:req.session.user_id});
-          // finding the product that the user have
-          const cartData= await Cart.findOne({userId:req.session.user_id})
-          .populate({
-               path:'items.productId',
-               populate:{
-                    path:'category',
-                    model:'Category'
-               }
-          });
-          res.render("checkout",{
-               user:userData,
-               cart:cartData,
-               addresses:addressData ? addressData.address:[],
-               coupons:couponData, 
-          })
-     } catch (error) {
-          console.log("checkout ",error)
-     }
- }
+const loadCheckout = async (req, res) => {
+    try {
+        // Finding the user
+        const userData = await User.findOne({ _id: req.session.user_id });
+
+        // Finding available coupons
+        const couponData = await Coupon.find();
+
+        // Finding user's address
+        const addressData = await Address.findOne({ userId: req.session.user_id });
+
+        // Finding cart and populating product and category details
+        const cartData = await Cart.findOne({ userId: req.session.user_id })
+            .populate({
+                path: 'items.productId',
+                populate: {
+                    path: 'category',
+                    model: 'Category'
+                }
+            });
+
+        // Check for quantity consistency and adjust if needed
+        if (cartData) {
+            cartData.items.forEach(async (item) => {
+                const product = item.productId;
+
+                // Check if the cart quantity exceeds the available stock
+                if (item.quantity > product.quantity) {
+                    item.quantity = product.quantity;
+                    await cartData.save();  // Save the adjusted cart data
+                }
+            });
+        }
+
+        // Render the checkout page with updated data
+        res.render("checkout", {
+            user: userData,
+            cart: cartData,
+            addresses: addressData ? addressData.address : [],
+            coupons: couponData,
+        });
+    } catch (error) {
+        console.log("checkout ", error);
+        res.status(500).json({ success: false, message: "An error occurred while loading checkout." });
+    }
+};
 
 
  // for adding the new address
