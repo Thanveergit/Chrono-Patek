@@ -77,6 +77,31 @@ const userMiddleware= (req,res,next)=>{
   next()
 };
 
+const setTitleMiddleware=(req,res,next)=>{
+  const routeTitleMap={
+    "/":"Home",
+    "/shope":"shop",
+    "/cart":"cart",
+    "/wishlist":"wishlist",
+    "/order-success":"orderSuccess",
+    "/profile":"profile",
+    "/viewOrders":"MyOrders",
+    "/order-details":"OrderDetails",
+    "/checkout":"Checkout",
+    "/wallet":"Wallet",
+    "/login":"Login",
+    "/signup":"SignUp",
+    "/otp":"Otp",
+    "/address":"Address",
+    "/editAddress":"EditAddress",
+    "/editPassword":"ChangePassword",
+    "/product":"Product",
+  }
+  res.locals.title=routeTitleMap[req.path] || "default title";
+  next()
+}
+
+userRouter.use(setTitleMiddleware)
 userRouter.use(wishlistCountMiddleware)
 userRouter.use(cartCountMiddleware)
 userRouter.use(userMiddleware);
@@ -176,5 +201,8 @@ userRouter.get(
     }
   );
   
+  userRouter.use((req,res)=>{
+    res.status(404).render("404")
+  })
 
 module.exports = userRouter;
