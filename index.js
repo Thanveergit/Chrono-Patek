@@ -103,6 +103,10 @@ app.use("/", userRoute);
 // Use the admin route
 app.use("/admin", adminRoute);
 
+app.use((req,res)=>{
+  res.status(404).render("404")
+})
+
 // Start the server
 const PORT=process.env.PORT
 app.listen(PORT, () => {
